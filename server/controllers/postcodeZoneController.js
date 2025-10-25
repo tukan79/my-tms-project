@@ -3,6 +3,10 @@ import * as zoneService from '../services/postcodeZoneService.js'; // Poprawiony
 import Papa from 'papaparse';
 import fs from 'fs'; // Moduł do operacji na plikach
 import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const getAllZones = async (req, res, next) => {
   try {
