@@ -1,9 +1,9 @@
-const userService = require('../services/userService');
-const Papa = require('papaparse');
-const fs = require('fs');
-const path = require('path');
+import * as userService from '../services/userService.js';
+import Papa from 'papaparse';
+import fs from 'fs';
+import path from 'path';
 
-exports.getAllUsers = async (req, res, next) => {
+export const getAllUsers = async (req, res, next) => {
   try {
     const users = await userService.findAllUsers();
     res.json(users);
@@ -12,7 +12,7 @@ exports.getAllUsers = async (req, res, next) => {
   }
 };
 
-exports.exportUsers = async (req, res, next) => {
+export const exportUsers = async (req, res, next) => {
   try {
     const users = await userService.findAllUsers();
     // Funkcja findAllUsers już zwraca bezpieczne dane bez hasła
@@ -36,7 +36,7 @@ exports.exportUsers = async (req, res, next) => {
   }
 };
 
-exports.createUser = async (req, res, next) => {
+export const createUser = async (req, res, next) => {
   try {
     const newUser = await userService.createUser(req.body);
     res.status(201).json(newUser);
@@ -45,7 +45,7 @@ exports.createUser = async (req, res, next) => {
   }
 };
 
-exports.updateUser = async (req, res, next) => {
+export const updateUser = async (req, res, next) => {
   try {
     const updatedUser = await userService.updateUser(req.params.userId, req.body);
     if (!updatedUser) {
@@ -57,7 +57,7 @@ exports.updateUser = async (req, res, next) => {
   }
 };
 
-exports.deleteUser = async (req, res, next) => {
+export const deleteUser = async (req, res, next) => {
   try {
     const changes = await userService.deleteUser(req.params.userId);
     if (changes === 0) {
@@ -69,7 +69,7 @@ exports.deleteUser = async (req, res, next) => {
   }
 };
 
-exports.importUsers = async (req, res, next) => {
+export const importUsers = async (req, res, next) => {
   try {
     if (!req.body || !Array.isArray(req.body)) {
       return res.status(400).json({ error: 'Invalid data format. An array of users is required.' });

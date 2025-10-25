@@ -4,7 +4,7 @@
  * Centralny middleware do obsługi błędów.
  * Loguje błędy i wysyła spójną odpowiedź do klienta.
  */
-const errorMiddleware = (error, req, res, next) => {
+export default (error, req, res, next) => {
   // Logowanie błędu po stronie serwera dla celów deweloperskich
   console.error('Error caught by middleware:', error);
 
@@ -40,5 +40,3 @@ const errorMiddleware = (error, req, res, next) => {
   }
   res.status(statusCode).json(response);
 };
-
-module.exports = errorMiddleware;

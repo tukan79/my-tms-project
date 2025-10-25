@@ -1,10 +1,15 @@
 // Plik server/db/init.js - Skrypt do inicjalizacji bazy danych
-const dotenv = require('dotenv');
-const bcrypt = require('bcryptjs');
-const db = require('./index');
+import dotenv from 'dotenv';
+import bcrypt from 'bcryptjs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import db from './index.js';
+import { isStrongPassword, passwordStrengthMessage } from '../utils/validation.js';
 
 // Ładujemy zmienne środowiskowe z pliku .env w katalogu server
-dotenv.config({ path: require('path').resolve(__dirname, '../.env') });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 const dropAllTables = async () => {
   console.log('🧹 Czyszczenie istniejących tabel i obiektów zależnych...');
@@ -487,6 +492,11 @@ const seedUsers = async () => {
   const defaultPassword = process.env.DEFAULT_USER_PASSWORD || 'password123';
   if (!process.env.DEFAULT_USER_PASSWORD) {
     console.warn('   ⚠️  WARNING: DEFAULT_USER_PASSWORD is not set in .env file. Using "password123" as a fallback for test users.');
+  } else {
+    // Sprawdzamy, czy hasło z .env jest wystarczająco silne
+    if (!isStrongPassword(defaultPassword)) {
+      console.warn(`   ⚠️  WARNING: The provided DEFAULT_USER_PASSWORD is not strong enough. ${passwordStrengthMessage}`);
+    }
   }
 
   const testUsers = [

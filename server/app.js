@@ -1,32 +1,35 @@
 // Plik server/app.js - Konfiguracja aplikacji Express
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const cookieParser = require('cookie-parser'); // Importujemy cookie-parser
-const rateLimit = require('express-rate-limit');
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
+import rateLimit from 'express-rate-limit';
+import compression from 'compression';
+import hpp from 'hpp';
+// import csurf from 'csurf'; // Tymczasowo wyłączone, wymaga express-session lub innej konfiguracji
+import logger from './config/logger.js'; // Importujemy nasz nowy logger
 
-const util = require('util'); // Importujemy moduł 'util'
 // Importujemy trasy
-const authRoutes = require('./routes/authRoutes');
-const driverRoutes = require('./routes/driverRoutes');
-const userRoutes = require('./routes/userRoutes');
-const truckRoutes = require('./routes/truckRoutes');
-const trailerRoutes = require('./routes/trailerRoutes');
-const orderRoutes = require('./routes/orderRoutes');
-const assignmentRoutes = require('./routes/assignmentRoutes');
-const runRoutes = require('./routes/runRoutes');
-const customerRoutes = require('./routes/customerRoutes.js');
-const postcodeZoneRoutes = require('./routes/postcodeZoneRoutes');
-const rateCardRoutes = require('./routes/rateCardRoutes');
-const surchargeTypeRoutes = require('./routes/surchargeTypeRoutes.js');
-const feedbackRoutes = require('./routes/feedbackRoutes.js');
-const invoiceRoutes = require('./routes/invoiceRoutes.js');
+import authRoutes from './routes/authRoutes.js';
+import driverRoutes from './routes/driverRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import truckRoutes from './routes/truckRoutes.js';
+import trailerRoutes from './routes/trailerRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
+import assignmentRoutes from './routes/assignmentRoutes.js';
+import runRoutes from './routes/runRoutes.js';
+import customerRoutes from './routes/customerRoutes.js';
+import postcodeZoneRoutes from './routes/postcodeZoneRoutes.js';
+import rateCardRoutes from './routes/rateCardRoutes.js';
+import surchargeTypeRoutes from './routes/surchargeTypeRoutes.js';
+import feedbackRoutes from './routes/feedbackRoutes.js';
+import invoiceRoutes from './routes/invoiceRoutes.js';
 // ... i tak dalej dla innych zasobów
 
 // Importujemy middleware do obsługi błędów
-const errorMiddleware = require('./middleware/errorMiddleware');
-const db = require('./db');
+import errorMiddleware from './middleware/errorMiddleware.js';
+import db from './db/index.js';
 
 const app = express();
 
@@ -40,6 +43,12 @@ const allowedOrigins = [
 
 // Middleware do parsowania ciasteczek musi być przed CORS, jeśli używasz credentials
 app.use(cookieParser());
+
+// Kompresja odpowiedzi - powinna być jak najwyżej
+app.use(compression());
+
+// Parsowanie ciała żądania
+app.use(express.json({ limit: '10mb' }));
 
 // --- Middleware bezpieczeństwa ---
 app.use(helmet()); // Ustawia bezpieczne nagłówki HTTP
@@ -68,6 +77,12 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter); // Stosuj do wszystkich tras API
 
+// Ochrona przed atakami HTTP Parameter Pollution
+app.use(hpp());
+
+// Ochrona przed CSRF - wymaga sesji lub cookie-parser
+// const csrfProtection = csurf({ cookie: true }); // Tymczasowo wyłączone
+
 // --- Middleware do kontroli cache ---
 // Wyłączamy cache dla wszystkich tras API, aby zapewnić, że klient zawsze otrzymuje świeże dane.
 app.use('/api', (req, res, next) => {
@@ -75,15 +90,14 @@ app.use('/api', (req, res, next) => {
   next();
 });
 
-// Globalne middleware
-app.use(express.json({ limit: '5mb' })); // Zwiększamy limit do 5MB, aby umożliwić import większych plików CSV.
-
 // Zaawansowane logowanie z morgan, które zawiera również ciało żądania
 if (process.env.NODE_ENV !== 'production') {
-  morgan.token('body', (req) => util.inspect(req.body, { depth: 3, colors: false }));
-  app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'));
+  // W trybie deweloperskim używamy morgana do logowania do konsoli w formacie 'dev'
+  app.use(morgan('dev'));
 } else {
-  app.use(morgan('combined')); // Standardowy format logów dla produkcji
+  // W trybie produkcyjnym logujemy do plików za pomocą winstona
+  const stream = { write: (message) => logger.info(message.trim()) };
+  app.use(morgan('combined', { stream }));
 }
 
 // --- Health Check Endpoint ---
@@ -97,7 +111,7 @@ app.get('/health', async (req, res) => {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
-    console.error('Health check failed:', error);
+    logger.error('Health check failed:', { error: error.message });
     res.status(503).json({ status: 'error', database: 'disconnected' });
   }
 });
@@ -126,4 +140,4 @@ app.use((req, res, next) => {
 
 app.use(errorMiddleware); // Centralny middleware do obsługi błędów
 
-module.exports = app;
+export default app;

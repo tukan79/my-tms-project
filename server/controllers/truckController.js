@@ -1,11 +1,11 @@
 // Plik server/controllers/truckController.js
-const truckService = require('../services/truckService.js'); // Użyjemy serwisu
-const Papa = require('papaparse');
-const fs = require('fs');
-const path = require('path');
+import * as truckService from '../services/truckService.js'; // Użyjemy serwisu
+import Papa from 'papaparse';
+import fs from 'fs';
+import path from 'path';
 
 
-exports.getAllTrucks = async (req, res, next) => {
+export const getAllTrucks = async (req, res, next) => {
   try {
     const trucks = await truckService.findTrucksByCompany();
     res.json(trucks);
@@ -14,7 +14,7 @@ exports.getAllTrucks = async (req, res, next) => {
   }
 };
 
-exports.exportTrucks = async (req, res, next) => {
+export const exportTrucks = async (req, res, next) => {
   try {
     const trucks = await truckService.findTrucksByCompany();
     const csv = Papa.unparse(trucks);
@@ -37,7 +37,7 @@ exports.exportTrucks = async (req, res, next) => {
   }
 };
 
-exports.createTruck = async (req, res, next) => {
+export const createTruck = async (req, res, next) => {
   try {
     const truckData = req.body;
 
@@ -53,7 +53,7 @@ exports.createTruck = async (req, res, next) => {
   }
 };
 
-exports.importTrucks = async (req, res, next) => {
+export const importTrucks = async (req, res, next) => {
   try {
     const { trucks } = req.body;
     if (!trucks || !Array.isArray(trucks)) {
@@ -68,7 +68,7 @@ exports.importTrucks = async (req, res, next) => {
   }
 };
 
-exports.updateTruck = async (req, res, next) => {
+export const updateTruck = async (req, res, next) => {
   try {
     const { truckId } = req.params;
     const truckData = req.body;
@@ -89,7 +89,7 @@ exports.updateTruck = async (req, res, next) => {
   }
 };
 
-exports.deleteTruck = async (req, res, next) => {
+export const deleteTruck = async (req, res, next) => {
   try {
     const { truckId } = req.params;
     const changes = await truckService.deleteTruck(truckId);

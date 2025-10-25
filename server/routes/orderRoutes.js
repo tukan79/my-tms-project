@@ -1,10 +1,10 @@
 // Plik server/routes/orderRoutes.js
-const express = require('express');
-const router = express.Router();
-const { authenticateToken, requireRole } = require('../middleware/authMiddleware');
-const orderController = require('../controllers/orderController');
+import express from 'express';
+import { authenticateToken, requireRole } from '../middleware/authMiddleware.js';
+import * as orderController from '../controllers/orderController.js';
 
 // Wszystkie trasy dla zleceń wymagają autentykacji
+const router = express.Router();
 router.use(authenticateToken, requireRole(['admin', 'dispatcher']));
 
 router.get('/', orderController.getAllOrders);
@@ -15,4 +15,4 @@ router.delete('/bulk', orderController.bulkDeleteOrders); // Nowa trasa
 router.delete('/:id', orderController.deleteOrder);
 router.get('/:id/labels', orderController.generateLabels);
 
-module.exports = router;
+export default router;

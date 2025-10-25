@@ -1,5 +1,5 @@
 // Plik server/db/index.js
-const { Pool } = require('pg');
+import pg from 'pg';
 // Nie ma potrzeby wczytywać dotenv tutaj, ponieważ jest już załadowany w głównym pliku server.js
 
 let pool;
@@ -10,7 +10,7 @@ const getPool = () => {
     // Pula jest tworzona dopiero przy pierwszym wywołaniu.
     // Jeśli zmienne środowiskowe są niepoprawne, błąd zostanie rzucony tutaj
     // i złapany przez blok try...catch w `startServer`.
-    pool = new Pool({
+    pool = new pg.Pool({
       host: process.env.DB_HOST,
       port: process.env.DB_PORT,
       database: process.env.DB_NAME,
@@ -26,7 +26,7 @@ const getPool = () => {
   return pool;
 };
 
-module.exports = {
+export default {
   // `query` to metoda do wykonywania zapytań do bazy danych
   query: (text, params) => getPool().query(text, params),
   // Możemy również wyeksportować samą pulę, jeśli potrzebne są bardziej zaawansowane operacje, np. transakcje

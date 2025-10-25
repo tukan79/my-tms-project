@@ -1,9 +1,9 @@
 // Plik: server/routes/rateCardRoutes.js
-const express = require('express');
-const router = express.Router();
-const rateCardController = require('../controllers/rateCardController');
-const { authenticateToken, requireRole } = require('../middleware/authMiddleware');
+import express from 'express';
+import * as rateCardController from '../controllers/rateCardController.js';
+import { authenticateToken, requireRole } from '../middleware/authMiddleware.js';
 
+const router = express.Router();
 router.get('/', authenticateToken, requireRole(['admin']), rateCardController.getAllRateCards);
 router.post('/', authenticateToken, requireRole(['admin']), rateCardController.createRateCard);
 router.put('/:id', authenticateToken, requireRole(['admin']), rateCardController.updateRateCard);
@@ -18,4 +18,4 @@ router.delete('/:id/customers/:customerId', authenticateToken, requireRole(['adm
 router.get('/debug/zones', rateCardController.debugZones);
 router.post('/check-zone-mapping', rateCardController.checkZoneMapping);
 
-module.exports = router;
+export default router;

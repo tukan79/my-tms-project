@@ -1,5 +1,5 @@
 // Plik: server/services/invoiceService.js
-const db = require('../db/index.js');
+import db from '../db/index.js';
 
 /**
  * Generuje następny numer faktury w formacie ROK/MIESIĄC/NUMER.
@@ -32,7 +32,7 @@ const getNextInvoiceNumber = async (client) => {
  * @param {string} endDate - Data końcowa (YYYY-MM-DD).
  * @returns {Promise<object>} Nowo utworzona faktura.
  */
-const createInvoice = async (customerId, startDate, endDate) => {
+export const createInvoice = async (customerId, startDate, endDate) => {
   return db.withTransaction(async (client) => {
     // 1. Znajdź wszystkie niezapłacone zlecenia dla klienta w danym okresie.
     const ordersToInvoiceRes = await client.query(
@@ -76,7 +76,7 @@ const createInvoice = async (customerId, startDate, endDate) => {
   });
 };
 
-const findAllInvoices = async () => {
+export const findAllInvoices = async () => {
   const sql = `
     SELECT 
       i.*, 
@@ -89,5 +89,3 @@ const findAllInvoices = async () => {
   const { rows } = await db.query(sql);
   return rows;
 };
-
-module.exports = { createInvoice, findAllInvoices };

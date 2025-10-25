@@ -1,9 +1,9 @@
 // Plik server/routes/truckRoutes.js
-const express = require('express');
-const router = express.Router();
-const truckController = require('../controllers/truckController.js');
-const { authenticateToken, requireRole } = require('../middleware/authMiddleware');
+import express from 'express';
+import * as truckController from '../controllers/truckController.js';
+import { authenticateToken, requireRole } from '../middleware/authMiddleware.js';
 
+const router = express.Router();
 router.use(authenticateToken, requireRole(['admin']));
 
 router.get('/', truckController.getAllTrucks);
@@ -13,4 +13,4 @@ router.post('/', truckController.createTruck);
 router.put('/:truckId', truckController.updateTruck);
 router.delete('/:truckId', truckController.deleteTruck);
 
-module.exports = router;
+export default router;

@@ -1,7 +1,7 @@
 // Plik: server/controllers/feedbackController.js
-const feedbackService = require('../services/feedbackService.js');
+import * as feedbackService from '../services/feedbackService.js';
 
-exports.reportBug = async (req, res, next) => {
+export const reportBug = async (req, res, next) => {
   try {
     const { description, context } = req.body;
 

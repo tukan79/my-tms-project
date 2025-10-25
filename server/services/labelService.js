@@ -1,14 +1,14 @@
 // Plik: server/services/labelService.js
-const PDFDocument = require('pdfkit');
-const bwipjs = require('bwip-js');
-const db = require('../db/index.js');
+import PDFDocument from 'pdfkit';
+import bwipjs from 'bwip-js';
+import db from '../db/index.js';
 
 /**
  * Generuje PDF z etykietami paletowymi dla danego zlecenia.
  * @param {number} orderId - ID zlecenia.
  * @returns {Promise<Buffer>} Bufor z danymi PDF.
  */
-const generatePalletLabelsPDF = async (orderId) => {
+export const generatePalletLabelsPDF = async (orderId) => {
   const { rows } = await db.query('SELECT * FROM orders WHERE id = $1', [orderId]);
   if (rows.length === 0) {
     throw new Error('Order not found');
@@ -86,8 +86,4 @@ const generatePalletLabelsPDF = async (orderId) => {
       reject(error);
     }
   });
-};
-
-module.exports = {
-  generatePalletLabelsPDF,
 };

@@ -1,8 +1,8 @@
-const express = require('express');
-const router = express.Router();
-const userController = require('../controllers/userController');
-const { authenticateToken, requireRole } = require('../middleware/authMiddleware');
+import express from 'express';
+import * as userController from '../controllers/userController.js';
+import { authenticateToken, requireRole } from '../middleware/authMiddleware.js';
 
+const router = express.Router();
 router.use(authenticateToken, requireRole(['admin']));
 
 router.get('/', userController.getAllUsers);
@@ -12,4 +12,4 @@ router.post('/import', userController.importUsers);
 router.put('/:userId', userController.updateUser);
 router.delete('/:userId', userController.deleteUser);
 
-module.exports = router;
+export default router;

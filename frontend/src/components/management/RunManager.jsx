@@ -25,17 +25,16 @@ const RunManager = ({ runs = [], trucks = [], trailers = [], drivers = [], onDat
   }, []);
 
   const handleSaveRun = useCallback(async (runData) => {
-    // This component doesn't have direct access to API actions.
-    // It should probably call a prop passed down from a higher-level component.
-    // For now, we'll assume `onDataRefresh` handles it.
-    console.log('Saving run:', runData);
-    // In a real scenario, you'd call something like:
-    // if (editingRun) {
-    //   await api.put(`/api/runs/${editingRun.id}`, runData);
-    // } else {
-    //   await api.post('/api/runs', runData);
-    // }
-    onDataRefresh();
+    try {
+      if (editingRun) {
+        await runActions.update(editingRun.id, runData);
+      } else {
+        await runActions.create(runData);
+      }
+      showToast('Run saved successfully!', 'success');
+    } catch (error) {
+      showToast(error.response?.data?.error || 'Failed to save run.', 'error');
+    }
     handleCancelForm();
   }, [onDataRefresh, handleCancelForm]);
 

@@ -1,8 +1,8 @@
 // Plik: server/services/manifestService.js
-const PDFDocument = require('pdfkit');
-const db = require('../db/index.js');
+import PDFDocument from 'pdfkit';
+import db from '../db/index.js';
 
-const generateRunManifestPDF = async (runId) => {
+export const generateRunManifestPDF = async (runId) => {
   // 1. Pobierz wszystkie niezbędne dane za jednym razem
   const runQuery = `
     SELECT 
@@ -101,5 +101,3 @@ const generateRunManifestPDF = async (runId) => {
     doc.end();
   });
 };
-
-module.exports = { generateRunManifestPDF };

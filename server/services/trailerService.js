@@ -1,6 +1,6 @@
-const db = require('../db/index.js');
+import db from '../db/index.js';
 
-const createTrailer = async (trailerData) => {
+export const createTrailer = async (trailerData) => {
   const { 
     registration_plate, brand, description, category, max_payload_kg, 
     max_spaces, length_m, width_m, height_m, weight_kg, status 
@@ -34,12 +34,12 @@ const createTrailer = async (trailerData) => {
   }
 };
 
-const findTrailersByCompany = async () => {
+export const findTrailersByCompany = async () => {
     const { rows } = await db.query('SELECT * FROM trailers WHERE is_deleted = FALSE ORDER BY registration_plate');
     return rows;
 };
 
-const updateTrailer = async (trailerId, trailerData) => {
+export const updateTrailer = async (trailerId, trailerData) => {
   const { 
     registration_plate, brand, description, category, max_payload_kg, 
     max_spaces, length_m, width_m, height_m, weight_kg, status 
@@ -70,12 +70,12 @@ const updateTrailer = async (trailerId, trailerData) => {
   return result.rows[0];
 };
 
-const deleteTrailer = async (trailerId) => {
+export const deleteTrailer = async (trailerId) => {
   const result = await db.query('UPDATE trailers SET is_deleted = TRUE WHERE id = $1', [trailerId]);
   return result.rowCount;
 };
 
-const importTrailers = async (trailersData) => {
+export const importTrailers = async (trailersData) => {
   return db.withTransaction(async (client) => {
     const importedTrailers = [];
     const sql = `
@@ -123,12 +123,4 @@ const importTrailers = async (trailersData) => {
 
     return { importedCount: importedTrailers.length, importedIds: importedTrailers.map(t => t.id) };
   });
-};
-
-module.exports = {
-  createTrailer,
-  findTrailersByCompany,
-  updateTrailer,
-  deleteTrailer,
-  importTrailers,
 };

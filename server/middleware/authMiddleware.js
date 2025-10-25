@@ -1,7 +1,7 @@
 // Plik server/middleware/authMiddleware.js
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
-const authenticateToken = (req, res, next) => {
+export const authenticateToken = (req, res, next) => {
   // Token z cookie lub nagłówka Authorization: Bearer <token>
   const header = req.headers.authorization;
   const headerToken = header && header.startsWith('Bearer ') ? header.slice(7) : null;
@@ -30,7 +30,7 @@ const authenticateToken = (req, res, next) => {
  * Middleware do sprawdzania, czy użytkownik ma jedną z wymaganych ról.
  * @param {string[]} roles - Tablica dozwolonych ról (np. ['admin', 'dispatcher']).
  */
-const requireRole = (roles) => {
+export const requireRole = (roles) => {
   return (req, res, next) => {
     // Zakładamy, że authenticateToken zostało już użyte i req.auth istnieje.
     if (!req.auth || !roles.includes(req.auth.role)) {
@@ -38,9 +38,4 @@ const requireRole = (roles) => {
     }
     next();
   };
-};
-
-module.exports = {
-  authenticateToken,
-  requireRole,
 };

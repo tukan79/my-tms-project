@@ -1,11 +1,11 @@
 // Plik server/controllers/trailerController.js
-const trailerService = require('../services/trailerService.js'); // Użyjemy serwisu
-const Papa = require('papaparse');
-const fs = require('fs');
-const path = require('path');
+import * as trailerService from '../services/trailerService.js'; // Użyjemy serwisu
+import Papa from 'papaparse';
+import fs from 'fs';
+import path from 'path';
 
 
-exports.getAllTrailers = async (req, res, next) => {
+export const getAllTrailers = async (req, res, next) => {
   try {
     const trailers = await trailerService.findTrailersByCompany();
     res.json(trailers);
@@ -14,7 +14,7 @@ exports.getAllTrailers = async (req, res, next) => {
   }
 };
 
-exports.exportTrailers = async (req, res, next) => {
+export const exportTrailers = async (req, res, next) => {
   try {
     const trailers = await trailerService.findTrailersByCompany();
     const csv = Papa.unparse(trailers);
@@ -37,7 +37,7 @@ exports.exportTrailers = async (req, res, next) => {
   }
 };
 
-exports.createTrailer = async (req, res, next) => {
+export const createTrailer = async (req, res, next) => {
   try {
     const trailerData = req.body;
 
@@ -53,7 +53,7 @@ exports.createTrailer = async (req, res, next) => {
   }
 };
 
-exports.importTrailers = async (req, res, next) => {
+export const importTrailers = async (req, res, next) => {
   try {
     const { trailers } = req.body;
     if (!trailers || !Array.isArray(trailers)) {
@@ -68,7 +68,7 @@ exports.importTrailers = async (req, res, next) => {
   }
 };
 
-exports.updateTrailer = async (req, res, next) => {
+export const updateTrailer = async (req, res, next) => {
   try {
     const { trailerId } = req.params;
     const trailerData = req.body;
@@ -89,7 +89,7 @@ exports.updateTrailer = async (req, res, next) => {
   }
 };
 
-exports.deleteTrailer = async (req, res, next) => {
+export const deleteTrailer = async (req, res, next) => {
   try {
     const { trailerId } = req.params;
     const changes = await trailerService.deleteTrailer(trailerId);

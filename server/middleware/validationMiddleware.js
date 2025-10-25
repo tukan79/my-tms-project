@@ -1,7 +1,7 @@
 // Plik: server/middleware/validationMiddleware.js
-const validator = require('validator');
+import validator from 'validator';
 
-exports.validateRun = (req, res, next) => {
+export const validateRun = (req, res, next) => {
   const { run_date, type, driver_id, truck_id } = req.body;
   const errors = [];
 

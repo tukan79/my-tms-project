@@ -26,15 +26,19 @@ export const AuthProvider = ({ children }) => {
       if (hasVerified.current) {
         return;
       }
-      hasVerified.current = true;
 
       if (token) {
-        // Interceptor w api.js automatycznie obsłuży błąd 401/403 i wyloguje użytkownika.
-        // W starym systemie, sam fakt posiadania tokenu i danych użytkownika wystarczał.
-        // Weryfikacja odbywa się przy każdym zapytaniu do API.
-        if (user) {
-          setIsAuthenticated(true); // Ustawiamy stan uwierzytelnienia
+        try {
+          // Wykonujemy zapytanie do backendu, aby zweryfikować token
+          await api.get('/api/auth/verify');
+          setIsAuthenticated(true);
+          hasVerified.current = true; // Oznaczamy, że weryfikacja została wykonana
+        } catch (error) {
+          console.error('Token verification failed:', error);
+          logout(); // Wyloguj, jeśli token jest nieprawidłowy
         }
+      } else {
+        hasVerified.current = true; // Jeśli nie ma tokenu, oznaczamy jako zweryfikowane (brak tokenu)
       }
       setLoading(false);
     };

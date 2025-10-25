@@ -1,8 +1,8 @@
 // Plik server/services/orderService.js
-const db = require('../db/index.js');
-const pricingService = require('./pricingService.js'); // Upewniamy się, że ścieżka jest jednoznaczna
+import db from '../db/index.js';
+import pricingService from './pricingService.js'; // Upewniamy się, że ścieżka jest jednoznaczna
 
-const createOrder = async (orderData) => {
+export const createOrder = async (orderData) => {
   return db.withTransaction(async (client) => {
     const { customer_id, order_number, service_level, customer_reference, status, sender_details, recipient_details, cargo_details, loading_date_time, unloading_date_time, selected_surcharges, unloading_start_time, unloading_end_time } = orderData;
 
@@ -58,12 +58,12 @@ const createOrder = async (orderData) => {
   });
 };
 
-const findAllOrders = async () => {
+export const findAllOrders = async () => {
   const { rows } = await db.query('SELECT * FROM orders WHERE is_deleted = FALSE ORDER BY created_at DESC');
   return rows;
 };
 
-const updateOrder = async (orderId, orderData) => {
+export const updateOrder = async (orderId, orderData) => {
   return db.withTransaction(async (client) => {
     // Krok 1: Pobierz aktualny stan zlecenia z bazy danych.
     const existingOrderRes = await client.query('SELECT * FROM orders WHERE id = $1', [orderId]);
@@ -186,7 +186,7 @@ const updateOrder = async (orderId, orderData) => {
 };
 
 // Funkcje pomocnicze do bezpiecznej konwersji typów
-const toInt = (value) => {
+export const toInt = (value) => {
   const num = parseInt(value, 10);
   return isNaN(num) ? null : num;
 };
@@ -206,13 +206,13 @@ const toBoolean = (value) => {
  * @param {string} timeStr - The time string (e.g., '14:30:00').
  * @returns {Date|null} A valid Date object or null.
  */
-const toDateTime = (dateStr, timeStr) => {
+export const toDateTime = (dateStr, timeStr) => {
   if (!dateStr) return null;
   const date = new Date(`${dateStr}T${timeStr || '12:00:00'}`);
   return isNaN(date.getTime()) ? null : date;
 };
 
-const importOrders = async (ordersData) => {
+export const importOrders = async (ordersData) => {
   // Używamy transakcji, aby zapewnić, że wszystkie zlecenia zostaną zaimportowane pomyślnie, lub żadne.
   return db.withTransaction(async (client) => {
     // Pobierz mapowanie kodów klientów na ich ID
@@ -294,18 +294,16 @@ const importOrders = async (ordersData) => {
   });
 };
 
-const deleteOrder = async (orderId) => {
+export const deleteOrder = async (orderId) => {
   // Używamy "soft delete" dla spójności z innymi częściami aplikacji
   const sql = 'UPDATE orders SET is_deleted = TRUE WHERE id = $1';
   const result = await db.query(sql, [orderId]);
   return result.rowCount; // Zwraca 1 jeśli usunięto, 0 jeśli nie znaleziono
 };
 
-const bulkDeleteOrders = async (orderIds) => {
+export const bulkDeleteOrders = async (orderIds) => {
   if (!orderIds || orderIds.length === 0) return 0;
   const sql = 'UPDATE orders SET is_deleted = TRUE WHERE id = ANY($1::int[])';
   const result = await db.query(sql, [orderIds]);
   return result.rowCount;
 };
-
-module.exports = { createOrder, findAllOrders, updateOrder, importOrders, deleteOrder, bulkDeleteOrders };

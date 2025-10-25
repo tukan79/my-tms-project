@@ -1,11 +1,11 @@
 // Plik server/controllers/driverController.js
-const driverService = require('../services/driverService.js');
-const Papa = require('papaparse');
-const fs = require('fs');
-const path = require('path');
+import * as driverService from '../services/driverService.js';
+import Papa from 'papaparse';
+import fs from 'fs';
+import path from 'path';
 
 
-exports.getAllDrivers = async (req, res, next) => {
+export const getAllDrivers = async (req, res, next) => {
   try {
     const drivers = await driverService.findDriversByCompany(); 
     res.status(200).json(drivers);
@@ -14,7 +14,7 @@ exports.getAllDrivers = async (req, res, next) => {
   }
 };
 
-exports.exportDrivers = async (req, res, next) => {
+export const exportDrivers = async (req, res, next) => {
   try {
     const drivers = await driverService.findDriversByCompany();
     const csv = Papa.unparse(drivers);
@@ -37,7 +37,7 @@ exports.exportDrivers = async (req, res, next) => {
   }
 };
 
-exports.importDrivers = async (req, res, next) => {
+export const importDrivers = async (req, res, next) => {
   try {
     const result = await driverService.importDrivers(req.body);
     res.status(201).json({ message: `Successfully processed ${result.count} drivers.`, ...result });
@@ -46,7 +46,7 @@ exports.importDrivers = async (req, res, next) => {
   }
 };
 
-exports.createDriver = async (req, res, next) => {
+export const createDriver = async (req, res, next) => {
   try {
     // Prosta walidacja - można ją rozbudować
     if (!req.body.first_name || !req.body.last_name) {
@@ -59,7 +59,7 @@ exports.createDriver = async (req, res, next) => {
   }
 };
 
-exports.updateDriver = async (req, res, next) => {
+export const updateDriver = async (req, res, next) => {
   try {
     const { driverId } = req.params;
     const driverData = req.body;
@@ -81,7 +81,7 @@ exports.updateDriver = async (req, res, next) => {
   }
 };
 
-exports.deleteDriver = async (req, res, next) => {
+export const deleteDriver = async (req, res, next) => {
   try {
     const { driverId } = req.params;
 

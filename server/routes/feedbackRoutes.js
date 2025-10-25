@@ -1,12 +1,12 @@
 // Plik: server/routes/feedbackRoutes.js
-const express = require('express');
-const router = express.Router();
-const feedbackController = require('../controllers/feedbackController.js');
-const { authenticateToken } = require('../middleware/authMiddleware');
+import express from 'express';
+import * as feedbackController from '../controllers/feedbackController.js';
+import { authenticateToken } from '../middleware/authMiddleware.js';
 
 // Wszystkie trasy w tym pliku wymagają zalogowanego użytkownika
+const router = express.Router();
 router.use(authenticateToken);
 
 router.post('/report-bug', feedbackController.reportBug);
 
-module.exports = router;
+export default router;

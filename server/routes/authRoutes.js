@@ -1,12 +1,12 @@
 // Plik server/routes/authRoutes.js
-const express = require('express');
-const router = express.Router();
-const { rateLimit } = require('express-rate-limit'); // Zmiana na import destrukturyzowany
-const authController = require('../controllers/authController.js');
-const { authenticateToken } = require('../middleware/authMiddleware');
+import express from 'express';
+import { rateLimit } from 'express-rate-limit'; // Zmiana na import destrukturyzowany
+import * as authController from '../controllers/authController.js';
+import { authenticateToken } from '../middleware/authMiddleware.js';
 
 // Dedykowany limiter dla tras logowania i rejestracji, aby chronić przed atakami brute-force
 // Dedicated limiter for login and registration routes to protect against brute-force attacks
+const router = express.Router();
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minut
   // Zwiększamy limit w środowisku deweloperskim.
@@ -19,8 +19,8 @@ const authLimiter = rateLimit({
 
 // Rejestracja nowego użytkownika
 // Register a new user
-router.post('/register', authLimiter, authController.register);
-router.post('/login', authLimiter, authController.login);
+router.post('/register', authLimiter, authController.registerValidation, authController.register);
+router.post('/login', authLimiter, authController.loginValidation, authController.login);
 
 // Dodajemy trasę do wylogowania
 router.post('/logout', authController.logout);
@@ -33,4 +33,4 @@ router.get('/verify', authenticateToken, authController.verifyToken);
 // Server status route (can be moved to another file, e.g., systemRoutes.js)
 router.get('/status', (req, res) => res.status(200).json({ message: 'TMS Server is running correctly! 🚀' }));
 
-module.exports = router;
+export default router;

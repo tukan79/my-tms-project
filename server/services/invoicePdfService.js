@@ -1,8 +1,8 @@
 // Plik: server/services/invoicePdfService.js
-const PDFDocument = require('pdfkit');
-const db = require('../db/index.js');
+import PDFDocument from 'pdfkit';
+import db from '../db/index.js';
 
-const generateInvoicePDF = async (invoiceId) => {
+export const generateInvoicePDF = async (invoiceId) => {
   // 1. Pobierz dane faktury, klienta i pozycji faktury
   const invoiceQuery = `
     SELECT i.*, c.name as customer_name, c.address_line1, c.address_line2, c.postcode, c.vat_number
@@ -102,5 +102,3 @@ const generateInvoicePDF = async (invoiceId) => {
     doc.end();
   });
 };
-
-module.exports = { generateInvoicePDF };

@@ -1,10 +1,10 @@
 // Plik server/routes/driverRoutes.js
-const express = require('express');
-const router = express.Router();
-const driverController = require('../controllers/driverController.js');
-const { authenticateToken, requireRole } = require('../middleware/authMiddleware');
+import express from 'express';
+import * as driverController from '../controllers/driverController.js';
+import { authenticateToken, requireRole } from '../middleware/authMiddleware.js';
 
 // Wszystkie trasy w tym pliku są chronione i wymagają uwierzytelnienia oraz uprawnień admina
+const router = express.Router();
 router.use(authenticateToken, requireRole(['admin']));
 
 router.get('/', driverController.getAllDrivers);
@@ -14,4 +14,4 @@ router.post('/', driverController.createDriver);
 router.put('/:driverId', driverController.updateDriver);
 router.delete('/:driverId', driverController.deleteDriver);
 
-module.exports = router;
+export default router;

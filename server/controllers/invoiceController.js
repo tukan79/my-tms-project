@@ -1,8 +1,8 @@
 // Plik: server/controllers/invoiceController.js
-const invoiceService = require('../services/invoiceService.js');
-const invoicePdfService = require('../services/invoicePdfService.js');
+import * as invoiceService from '../services/invoiceService.js';
+import * as invoicePdfService from '../services/invoicePdfService.js';
 
-const createInvoice = async (req, res, next) => {
+export const createInvoice = async (req, res, next) => {
   try {
     const { customerId, startDate, endDate } = req.body;
     if (!customerId || !startDate || !endDate) {
@@ -17,7 +17,7 @@ const createInvoice = async (req, res, next) => {
   }
 };
 
-const getAllInvoices = async (req, res, next) => {
+export const getAllInvoices = async (req, res, next) => {
   try {
     const invoices = await invoiceService.findAllInvoices();
     res.json(invoices);
@@ -26,7 +26,7 @@ const getAllInvoices = async (req, res, next) => {
   }
 };
 
-const downloadInvoicePDF = async (req, res, next) => {
+export const downloadInvoicePDF = async (req, res, next) => {
   try {
     const { id } = req.params;
     const pdfBuffer = await invoicePdfService.generateInvoicePDF(id);
@@ -36,10 +36,4 @@ const downloadInvoicePDF = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
-
-module.exports = {
-  createInvoice,
-  getAllInvoices,
-  downloadInvoicePDF,
 };
