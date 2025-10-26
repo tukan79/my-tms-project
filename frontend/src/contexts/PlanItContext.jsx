@@ -190,17 +190,20 @@ export const PlanItProvider = ({ children, initialData = {}, runActions, onAssig
   }, [editingRun, runActions, showToast, triggerRefresh, selectedDate]);
 
   const handleDeleteRun = useCallback(async (run) => {
-    if (window.confirm(`Are you sure you want to delete run: ${run.displayText}?`)) {
-      try {
-        await runActions.delete(run.id);
-        showToast(`Run "${run.displayText}" deleted.`, 'success');
-        triggerRefresh();
-      } catch (error) {
-        console.error('❌ Error deleting run:', error);
-        showToast(error.response?.data?.error || 'Failed to delete run.', 'error');
+    onDeleteRequest(
+      `Are you sure you want to delete run: ${run.displayText}?`,
+      async () => {
+        try {
+          await runActions.delete(run.id);
+          showToast(`Run "${run.displayText}" deleted.`, 'success');
+          triggerRefresh();
+        } catch (error) {
+          console.error('❌ Error deleting run:', error);
+          showToast(error.response?.data?.error || 'Failed to delete run.', 'error');
+        }
       }
-    }
-  }, [runActions, showToast, triggerRefresh]);
+    );
+  }, [runActions, showToast, triggerRefresh, onDeleteRequest]);
 
   // POPRAWIONA: Funkcja usuwania assignmentu z odświeżaniem
   const handleDeleteAssignmentWithRefresh = useCallback(async (assignmentId) => {
