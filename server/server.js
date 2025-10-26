@@ -1,5 +1,9 @@
  // Plik server/server.js - Główny plik startowy serwera
- import 'dotenv/config'; // Automatycznie ładuje .env z bieżącego katalogu
+ // Warunkowo ładujemy dotenv tylko w środowisku deweloperskim.
+ // Na produkcji (np. na Render) zmienne są dostarczane bezpośrednio.
+ if (process.env.NODE_ENV !== 'production') {
+  await import('dotenv/config');
+ }
  import app from './app.js';
  
  // Używamy bardziej specyficznej zmiennej, aby uniknąć konfliktów z globalnym `PORT`
