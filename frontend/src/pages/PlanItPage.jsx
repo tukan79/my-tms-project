@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { DragDropContext } from '@hello-pangea/dnd';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import PlanItOrders, { useHomeZone } from '../components/plan-it/PlanItOrders.jsx';
 import PlanItRuns from '../components/plan-it/PlanItRuns.jsx';
 import { usePopOut } from '../contexts/PopOutContext.jsx'; // Ścieżka względna, więc bez zmian

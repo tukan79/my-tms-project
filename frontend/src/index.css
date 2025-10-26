@@ -633,11 +633,7 @@ h2 {
   list-style: none;
   padding: 0;
   margin: 0;
-  overflow-y: auto; /* Zmieniamy na overflow-y, aby tylko pionowe przewijanie było domyślne */
-  /* Usuwamy flex-grow: 1, aby lista nie rozpychała się na całą wysokość,
-     co pozwoli na wyświetlenie ActiveRunView pod nią.
-     Wysokość będzie teraz zarządzana przez kontener flex. */
-  overflow: visible;
+  overflow: visible; /* Zmieniono na visible, aby uniknąć zagnieżdżonych scrolli z .planit-grid-body */
 }
 
 .planit-list-item {

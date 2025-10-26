@@ -33,30 +33,27 @@ import ViewRenderer from './components/shared/ViewRenderer.jsx';
 import Sidebar from './components/shared/Sidebar.jsx'; // Import nowego komponentu
 import MainHeader from './components/shared/MainHeader.jsx'; // Import nowego komponentu
 import BugReportButton from './components/shared/BugReportButton.jsx'; // Import przycisku do zgłaszania błędów
+import { generateViewConfig } from './config/viewConfig.jsx';
+
+
 
 const DashboardContent = () => {
   const {
-    user, currentView,
-    setShowForm, setItemToEdit, handleGenericExport, modalState, handleCloseModal, isLoading, handleDeleteRequest, showToast,
-    data, refreshAll, handleEditClick, actions, // Dodajemy `actions` z hooka
-    handleViewChange // Dodajemy handleViewChange
+    user, modalState, handleCloseModal, handleDeleteRequest, showToast,
+    data, refreshAll, actions,
   } = useDashboard();
 
-  const isAdmin = user?.role === 'admin';
   // Zapewniamy domyślny pusty obiekt, aby uniknąć błędu, gdy `data` jest `undefined` podczas początkowego renderowania.
-  const { orders, drivers, trucks, trailers, users, assignments, runs, customers, zones, surcharges, invoices } = data || {};
-  const isDispatcher = user?.role === 'dispatcher';
+  const { customers, surcharges } = data || {};
 
   // Nowa, dedykowana funkcja do edycji zlecenia z dowolnego miejsca w aplikacji
   const handleEditOrderFromAnywhere = (order) => {
     if (!order || !order.id) return;
-    // 1. Zapisz dane zlecenia w sessionStorage, aby nowe okno mogło je odczytać
     sessionStorage.setItem('editOrderData', JSON.stringify({
       itemToEdit: order,
-      clients: customers, // Poprawka: używamy zmiennej 'customers'
+      clients: customers,
       surcharges,
     }));
-    // 2. Otwórz nowe okno przeglądarki na dedykowanej trasie
     const url = `/orders/${order.id}/edit`;
     window.open(url, `Edit Order ${order.order_number || order.id}`, 'width=1000,height=800,resizable=yes,scrollbars=yes');
   };
@@ -78,35 +75,17 @@ const DashboardContent = () => {
       showToast('Failed to download labels.', 'error');
     }
   };
-  // Konfiguracja widoków jest teraz tutaj, w komponencie, który jej używa.
-  const viewConfig = useMemo(() => ({
-    // Widoki, które są pojedynczymi komponentami
-    runs: { Component: RunManager, props: { runs, trucks, trailers, drivers, onDataRefresh: refreshAll, onDeleteRequest: handleDeleteRequest, runActions: actions.runs } },
-    planit: { Component: PlanItPage, props: { orders, runs, assignments, drivers, trucks, trailers, zones, pallets: data?.pallets || [], onAssignmentCreated: refreshAll, onEdit: handleEditOrderFromAnywhere, surcharges, runActions: actions.runs, onDeleteRequest: handleDeleteRequest, bulkAssignOrders: actions.assignments.bulkCreate } },
-    finance: { Component: FinancePage, props: { orders, customers, surcharges, invoices, onEdit: handleEditOrderFromAnywhere, onRefresh: refreshAll, invoiceActions: actions.invoices } },
-    pricing: { Component: PricingPage, props: { customers, zones, onRefresh: refreshAll } },
-    surcharges: { Component: SurchargeTypesManager, props: { surcharges } },
-    // Widoki dostępne tylko dla admina.
-    ...(isAdmin && {
-      drivers: { ListComponent: DriverList, FormComponent: AddDriverForm, data: drivers },
-      trucks: { ListComponent: TruckList, FormComponent: AddTruckForm, data: trucks },
-      customers: { ListComponent: CustomerList, FormComponent: AddCustomerForm, data: customers },
-      trailers: { ListComponent: TrailerList, FormComponent: AddTrailerForm, data: trailers },
-      users: { ListComponent: UserList, FormComponent: AddUserForm, data: users },
-    }),
-    // Widoki dostępne dla admina i dyspozytora.
-    ...((isAdmin || isDispatcher) && {
-      orders: { 
-        ListComponent: OrderList, 
-        FormComponent: AddOrderForm, 
-        formProps: { clients: customers, surcharges }, // Dodajemy surcharges do propsów formularza
-        data: orders,
-        customActions: [
-          { icon: <Printer size={16} />, onClick: handlePrintLabels, title: 'Print Pallet Labels' }
-        ]
-      },
-    }),
-  }), [isAdmin, isDispatcher, orders, drivers, trucks, trailers, users, assignments, runs, customers, zones, surcharges, refreshAll, handleEditClick, handleDeleteRequest, handleEditOrderFromAnywhere, handleViewChange, actions.runs, handlePrintLabels]);
+
+  // Generowanie konfiguracji widoków za pomocą nowej funkcji
+  const viewConfig = useMemo(() => generateViewConfig({
+    user,
+    data,
+    actions,
+    refreshAll,
+    handleDeleteRequest,
+    handleEditOrderFromAnywhere,
+    handlePrintLabels,
+  }), [user, data, actions, refreshAll, handleDeleteRequest, handleEditOrderFromAnywhere, handlePrintLabels]);
 
   // Dodajemy klasę do body tylko dla głównej aplikacji, aby uniknąć problemów ze scrollowaniem w pop-outach
   useEffect(() => {
@@ -116,11 +95,9 @@ const DashboardContent = () => {
     };
   }, []);
 
-
   return (
     <div className="app-container">
       <Sidebar />
-
       <main className="main-content">
         <MainHeader viewConfig={viewConfig} />
         <ViewRenderer viewConfig={viewConfig} />

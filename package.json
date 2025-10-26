@@ -12,19 +12,27 @@
     "server-dev": "npm run dev -w server",
     "client-dev": "npm run dev -w frontend",
     "build": "npm run build --workspaces",
-    "start": "npm run start -w server",
+    "start": "npm start --workspace=server",
     "clean": "rimraf node_modules server/node_modules frontend/node_modules",
     "db:init": "node server/db/init.js",
-    "postinstall": "npm rebuild",
     "check-updates": "npx npm-check-updates --workspaces --root",
     "update-packages": "npx npm-check-updates --workspaces --root -u"
   },
-  "keywords": ["tms", "transport", "postgresql", "react", "nodejs"],
+  "keywords": [
+    "tms",
+    "transport",
+    "postgresql",
+    "react",
+    "nodejs"
+  ],
   "author": "Krzysztof Stolarski",
   "license": "ISC",
   "devDependencies": {
     "concurrently": "^9.2.1",
     "npm-check-updates": "^19.1.1",
     "rimraf": "^6.0.1"
+  },
+  "dependencies": {
+    "react-window": "^2.2.1"
   }
 }

@@ -15,9 +15,20 @@ export const usePlanIt = () => {
 
 export const PlanItProvider = ({ children, initialData = {}, runActions, onAssignmentCreated, onDeleteRequest, bulkAssignOrders: bulkAssignOrdersFromHook }) => {
   const { showToast } = useToast();
-  const { orders = [], runs = [], drivers = [], trucks = [], trailers = [], initialAssignments = [], zones = [] } = initialData;
+  
+  // Zapewniamy domyślne puste tablice dla wszystkich danych, aby uniknąć błędów
+  const { 
+    orders = [], 
+    runs = [], 
+    drivers = [], 
+    trucks = [], 
+    trailers = [], 
+    pallets = [],
+    assignments: initialAssignmentsFromData = [],
+    zones = [] 
+  } = initialData;
 
-  // State that was in PlanItPage
+  // --- State Management ---
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
   const [activeRunId, setActiveRunId] = useState(null);
   const [editingRun, setEditingRun] = useState(null);
@@ -29,72 +40,84 @@ export const PlanItProvider = ({ children, initialData = {}, runActions, onAssig
     y: 0,
   });
 
-  // Logic from PlanItPage/PlanItContent
+  // Stabilna funkcja do wymuszania odświeżania danych z poziomu nadrzędnego komponentu
+  const triggerRefresh = useCallback(() => {
+    if (onAssignmentCreated) {
+      onAssignmentCreated();
+    }
+  }, [onAssignmentCreated]);
+
+  // --- Optymalizacja wydajności: Tworzenie map (lookup tables) do szybkiego wyszukiwania ---
+  const driverMap = useMemo(() => new Map(drivers.map(d => [d.id, d])), [drivers]);
+  const truckMap = useMemo(() => new Map(trucks.map(t => [t.id, t])), [trucks]);
+  const trailerMap = useMemo(() => new Map(trailers.map(t => [t.id, t])), [trailers]);
+  const orderMap = useMemo(() => new Map(orders.map(o => [o.id, o])), [orders]);
+
+  // Grupowanie przypisań po run_id dla błyskawicznego dostępu O(1) w pętli
+  const assignmentsByRun = useMemo(() => {
+    const map = new Map();
+    for (const assignment of initialAssignmentsFromData) {
+      if (!map.has(assignment.run_id)) {
+        map.set(assignment.run_id, []);
+      }
+      map.get(assignment.run_id).push(assignment);
+    }
+    return map;
+  }, [initialAssignmentsFromData]);
+
+  // --- Memoized Data Derivations ---
   const enrichedRuns = useMemo(() => {
-    return runs
-      .filter(run => {
-        if (!run.run_date) return false;
-        return run.run_date.startsWith(selectedDate);
-      })
-      .map(run => {
-        const driver = drivers.find(d => d.id === run.driver_id);
-        const truck = trucks.find(t => t.id === run.truck_id);
-        const trailer = run.trailer_id ? trailers.find(t => t.id === run.trailer_id) : null;
+    const filteredRuns = runs.filter(run => run.run_date?.startsWith(selectedDate));
 
-        const assignedOrders = initialAssignments
-          .filter(a => a.run_id === run.id)
-          .map(a => orders.find(o => o.id === a.order_id))
-          .filter(Boolean);
+    return filteredRuns.map(run => {
+      const driver = driverMap.get(run.driver_id);
+      const truck = truckMap.get(run.truck_id);
+      const trailer = run.trailer_id ? trailerMap.get(run.trailer_id) : null;
 
-        const totalKilos = assignedOrders.reduce((sum, order) => sum + (order.cargo_details?.total_kilos || 0), 0);
-        const totalSpaces = assignedOrders.reduce((sum, order) => sum + (order.cargo_details?.total_spaces || 0), 0);
+      const runAssignments = assignmentsByRun.get(run.id) || [];
+      const assignedOrders = runAssignments.map(a => orderMap.get(a.order_id)).filter(Boolean);
 
-        let maxPayload = null;
-        let maxPallets = null;
-        let hasCapacity = false;
+      const { totalKilos, totalSpaces } = assignedOrders.reduce((acc, order) => {
+        acc.totalKilos += order.cargo_details?.total_kilos || 0;
+        acc.totalSpaces += order.cargo_details?.total_spaces || 0;
+        return acc;
+      }, { totalKilos: 0, totalSpaces: 0 });
 
-        if (truck?.type_of_truck === 'rigid') {
-          maxPayload = truck.max_payload_kg;
-          maxPallets = truck.pallet_capacity;
-          hasCapacity = true;
-        } else if (truck?.type_of_truck === 'tractor' && trailer) {
-          maxPayload = trailer.max_payload_kg;
-          maxPallets = trailer.max_spaces;
-          hasCapacity = true;
-        }
+      const hasCapacity = truck?.type_of_truck === 'rigid' || (truck?.type_of_truck === 'tractor' && trailer);
+      const maxPayload = hasCapacity ? (truck?.type_of_truck === 'rigid' ? truck.max_payload_kg : trailer?.max_payload_kg) : null;
+      const maxPallets = hasCapacity ? (truck?.type_of_truck === 'rigid' ? truck.pallet_capacity : trailer?.max_spaces) : null;
 
-        return {
-          ...run,
-          displayText: `${driver ? `${driver.first_name} ${driver.last_name}` : 'No Driver'} - ${truck ? truck.registration_plate : 'No Truck'} ${trailer ? `+ ${trailer.registration_plate}` : ''}`,
-          totalKilos,
-          totalSpaces,
-          maxPayload,
-          maxPallets,
-          hasCapacity,
-        };
-      });
-  }, [runs, drivers, trucks, trailers, initialAssignments, orders, selectedDate]);
+      return {
+        ...run,
+        displayText: `${driver ? `${driver.first_name} ${driver.last_name}` : 'No Driver'} - ${truck ? truck.registration_plate : 'No Truck'} ${trailer ? `+ ${trailer.registration_plate}` : ''}`,
+        totalKilos,
+        totalSpaces,
+        maxPayload,
+        maxPallets,
+        hasCapacity,
+      };
+    });
+  }, [runs, selectedDate, driverMap, truckMap, trailerMap, assignmentsByRun, orderMap]);
 
-  // Poprawka: Używamy useMemo, aby ustabilizować dane przekazywane do useAssignments.
   const assignmentsData = useMemo(() => ({
-    initialAssignments,
+    initialAssignments: initialAssignmentsFromData,
     orders,
     enrichedRuns,
-    onDataRefresh: onAssignmentCreated,
-  }), [initialAssignments, orders, enrichedRuns, onAssignmentCreated]);
+    onDataRefresh: triggerRefresh,
+  }), [initialAssignmentsFromData, orders, enrichedRuns, triggerRefresh]);
 
   const {
     assignments,
     availableOrders,
-    handleDragEnd, // Zmieniono z `deleteAssignment`
+    handleDragEnd,
     handleDeleteAssignment,
-    bulkAssignOrders, // Zmieniono z `bulkAssignOrders`
-    error, // Zmieniono z `error`
+    error,
   } = useAssignments(assignmentsData);
 
-  // POPRAWIONE: Obsługa błędów w useEffect, aby uniknąć pętli renderowania.
+  // Centralna obsługa błędów z hooka useAssignments
   React.useEffect(() => {
     if (error) {
+      console.error('❌ useAssignments error:', error);
       showToast(error, 'error');
     }
   }, [error, showToast]);
@@ -103,10 +126,16 @@ export const PlanItProvider = ({ children, initialData = {}, runActions, onAssig
 
   const ordersForActiveRun = useMemo(() => {
     if (!activeRun) return [];
-    return assignments.filter(a => a.run_id === activeRun.id).map(a => ({ ...orders.find(o => o.id === a.order_id), assignmentId: a.id }));
-  }, [activeRun, assignments, orders]);
+    return assignments
+      .filter(a => a.run_id === activeRun.id)
+      .map(a => {
+        const order = orderMap.get(a.order_id);
+        return order ? { ...order, assignmentId: a.id } : null;
+      })
+      .filter(Boolean);
+  }, [activeRun, assignments, orderMap]);
 
-  // Handlers that were in PlanItPage
+  // --- Handlers ---
   const handleEditRun = useCallback((run) => {
     setEditingRun(run);
     setIsFormVisible(true);
@@ -118,74 +147,94 @@ export const PlanItProvider = ({ children, initialData = {}, runActions, onAssig
   }, []);
 
   const handleSaveRun = useCallback(async (runData) => {
-    if (editingRun) {
-      await runActions.update(editingRun.id, runData);
-      showToast('Run updated successfully!', 'success');
-    } else {
-      await runActions.create(runData);
-      showToast('Run created successfully!', 'success');
+    try {
+      const payload = { ...runData, trailer_id: runData.trailer_id || null };
+
+      if (editingRun) {
+        await runActions.update(editingRun.id, payload);
+        showToast('Run updated successfully!', 'success');
+      } else {
+        await runActions.create(payload);
+        showToast('Run created successfully!', 'success');
+      }
+      setIsFormVisible(false);
+      setEditingRun(null);
+      triggerRefresh();
+      if (payload?.run_date && payload.run_date !== selectedDate) {
+        setSelectedDate(payload.run_date);
+        setActiveRunId(null);
+      }
+    } catch (err) {
+      console.error('❌ Error saving run:', err);
+      showToast(err.response?.data?.message || err.message || 'Failed to save run', 'error');
     }
-    setIsFormVisible(false);
-    setEditingRun(null);
-    if (onAssignmentCreated) onAssignmentCreated();
-  }, [editingRun, runActions, onAssignmentCreated, showToast]);
+  }, [editingRun, runActions, showToast, triggerRefresh, selectedDate]);
 
   const handleDeleteRun = useCallback(async (run) => {
     onDeleteRequest(
       `Are you sure you want to delete run: ${run.displayText}?`,
       async () => {
-        await runActions.delete(run.id);
-        showToast(`Run "${run.displayText}" deleted.`, 'success');
-        if (onAssignmentCreated) onAssignmentCreated();
+        try {
+          await runActions.delete(run.id);
+          showToast(`Run "${run.displayText}" deleted.`, 'success');
+          triggerRefresh();
+        } catch (err) {
+          console.error('❌ Error deleting run:', err);
+          showToast(err.response?.data?.error || 'Failed to delete run.', 'error');
+        }
       }
     );
-  }, [runActions, showToast, onAssignmentCreated, onDeleteRequest]);
+  }, [runActions, showToast, triggerRefresh, onDeleteRequest]);
+
+  const handleDeleteAssignmentWithRefresh = useCallback(async (assignmentId) => {
+    try {
+      await handleDeleteAssignment(assignmentId);
+      triggerRefresh();
+    } catch (err) {
+      console.error('❌ Error during assignment deletion and refresh:', err);
+      // Błąd jest już obsłużony w `useAssignments`, więc nie trzeba go tu ponownie pokazywać
+    }
+  }, [handleDeleteAssignment, triggerRefresh]);
 
   const handleBulkAssign = useCallback(async () => {
-    if (!activeRunId) {
-      showToast('Please select an active run first.', 'error');
-      return;
-    }
-    if (selectedOrderIds.length === 0) {
-      showToast('No orders selected for assignment.', 'error');
-      return;
-    }
+    if (!activeRunId) return showToast('Please select an active run first.', 'error');
+    if (selectedOrderIds.length === 0) return showToast('No orders selected for assignment.', 'error');
 
     try {
-      const payload = {
-        run_id: activeRunId,
-        order_ids: selectedOrderIds,
-      };
-      const result = await bulkAssignOrdersFromHook(payload);
+      const result = await bulkAssignOrdersFromHook({ run_id: activeRunId, order_ids: selectedOrderIds });
       if (result.success) {
         showToast(result.message, 'success');
         setSelectedOrderIds([]);
+        triggerRefresh();
       } else {
         showToast(result.message, 'error');
       }
-    } catch (error) {
-      console.error('Bulk assign failed:', error);
-      showToast('An unexpected error occurred during bulk assignment.', 'error');
+    } catch (err) {
+      console.error('❌ Bulk assign failed:', err);
+      showToast(err.response?.data?.message || 'An unexpected error occurred.', 'error');
     }
-  }, [activeRunId, selectedOrderIds, bulkAssignOrdersFromHook, showToast, setSelectedOrderIds]);
+  }, [activeRunId, selectedOrderIds, bulkAssignOrdersFromHook, showToast, triggerRefresh]);
 
   const handleBulkDelete = useCallback(() => {
-    if (selectedOrderIds.length === 0) {
-      showToast('No orders selected for deletion.', 'error');
-      return;
-    }
+    if (selectedOrderIds.length === 0) return showToast('No orders selected for deletion.', 'error');
+    
     const onConfirm = async () => {
       try {
         await api.delete('/api/orders/bulk', { data: { ids: selectedOrderIds } });
         showToast(`${selectedOrderIds.length} orders deleted successfully.`, 'success');
         setSelectedOrderIds([]);
-        if (onAssignmentCreated) onAssignmentCreated();
-      } catch (error) { showToast(error.response?.data?.error || 'Failed to delete orders.', 'error'); }
+        triggerRefresh();
+      } catch (err) {
+        console.error('❌ Bulk delete failed:', err);
+        showToast(err.response?.data?.error || 'Failed to delete orders.', 'error');
+      }
     };
+    
     onDeleteRequest(`Are you sure you want to delete ${selectedOrderIds.length} selected orders? This action cannot be undone.`, onConfirm);
-  }, [selectedOrderIds, onDeleteRequest, showToast, onAssignmentCreated, setSelectedOrderIds]);
+  }, [selectedOrderIds, onDeleteRequest, showToast, triggerRefresh]);
 
-  const value = {
+  // --- Context Value ---
+  const value = useMemo(() => ({
     selectedDate,
     activeRunId,
     editingRun,
@@ -203,18 +252,20 @@ export const PlanItProvider = ({ children, initialData = {}, runActions, onAssig
     handleBulkAssign,
     handleBulkDelete,
     handleDeleteRun,
-    // Data from hooks
     enrichedRuns,
     availableOrders,
     activeRun,
     ordersForActiveRun,
     handleDragEnd,
-    handleDeleteAssignment,
-    // Dodajemy brakujące dane, aby były dostępne w komponentach podrzędnych
-    initialData: {
-      drivers, trucks, trailers, zones,
-    },
-  };
+    handleDeleteAssignment: handleDeleteAssignmentWithRefresh,
+    initialData: { drivers, trucks, trailers, zones, pallets },
+    triggerRefresh,
+  }), [
+    selectedDate, activeRunId, editingRun, isFormVisible, selectedOrderIds, contextMenu,
+    handleEditRun, handleAddNewRun, handleSaveRun, handleBulkAssign, handleBulkDelete, handleDeleteRun,
+    enrichedRuns, availableOrders, activeRun, ordersForActiveRun, handleDragEnd, handleDeleteAssignmentWithRefresh,
+    drivers, trucks, trailers, zones, pallets, triggerRefresh
+  ]);
 
   return <PlanItContext.Provider value={value}>{children}</PlanItContext.Provider>;
 };
