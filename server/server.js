@@ -12,22 +12,35 @@
  // Używamy `process.env.PORT` dla zgodności z produkcją, a `process.env.API_PORT` jako fallback dla lokalnego rozwoju.
  const PORT = process.env.PORT || process.env.API_PORT || 3000;
  
- const server = app.listen(PORT, '0.0.0.0', () => {
-   console.log(`🚀 Server is running on port ${PORT} and is accessible from your network.`);
- });
+ let server;
  
- // Ulepszona obsługa błędów serwera
- server.on('error', (error) => {
-   if (error.syscall !== 'listen') {
-     throw error;
-   }
+ const startServer = async () => {
+   try {
+     // Krok 1: Sprawdź połączenie z bazą danych przed uruchomieniem serwera
+     console.log('🔵 Verifying database connection...');
+     await db.testConnection();
+     console.log('✅ Database connection verified.');
  
-   if (error.code === 'EADDRINUSE') {
-     console.error(`❌ Error: Port ${PORT} is already in use.`);
-     console.error('Another application (maybe another instance of this server) is running on this port.');
+     // Krok 2: Uruchom serwer Express
+     server = app.listen(PORT, '0.0.0.0', () => {
+       console.log(`🚀 Server is running on port ${PORT} and is accessible from your network.`);
+     });
+ 
+     // Ulepszona obsługa błędów serwera
+     server.on('error', (error) => {
+       if (error.syscall !== 'listen') throw error;
+       if (error.code === 'EADDRINUSE') {
+         console.error(`❌ Error: Port ${PORT} is already in use.`);
+         process.exit(1);
+       }
+     });
+   } catch (error) {
+     console.error('🔥 Failed to start server due to database connection error:', error.message);
      process.exit(1);
    }
- });
+ };
+ 
+ startServer();
  
  // --- Graceful Shutdown ---
  // Obsługa sygnału SIGTERM, który jest wysyłany przez platformy takie jak Render podczas wdrożeń.

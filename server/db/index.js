@@ -39,6 +39,11 @@ const getPool = () => {
 export default {
   // `query` to metoda do wykonywania zapytań do bazy danych
   query: (text, params) => getPool().query(text, params),
+  // Nowa metoda do testowania połączenia
+  testConnection: async () => {
+    const client = await getPool().connect();
+    client.release();
+  },
   // Możemy również wyeksportować samą pulę, jeśli potrzebne są bardziej zaawansowane operacje, np. transakcje
   getPool,
   // Dodajemy metodę do zamykania puli połączeń, przydatną przy zamykaniu serwera
