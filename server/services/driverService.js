@@ -1,5 +1,5 @@
 // Plik server/services/driverService.js
-import db from '../db/index.js';
+const db = require('../db/index.js');
 
 /**
  * Tworzy nowego kierowcę dla zalogowanego użytkownika (firmy).
@@ -7,7 +7,7 @@ import db from '../db/index.js';
  * @param {object} driverData - Dane kierowcy.
  * @returns {Promise<object>} Nowo utworzony obiekt kierowcy.
  */
-export const createDriver = async (driverData) => {
+const createDriver = async (driverData) => {
   let { first_name, last_name, phone_number = '', cpc_number = '', login_code = '', license_number = '', is_active = true } = driverData;
 
   // Automatyczne generowanie login_code, jeśli nie został podany.
@@ -45,7 +45,7 @@ export const createDriver = async (driverData) => {
  * Finds all drivers for a given company.
  * @returns {Promise<Array<object>>} Tablica obiektów kierowców.
  */
-export const findDriversByCompany = async () => {
+const findDriversByCompany = async () => {
   const { rows } = await db.query('SELECT * FROM drivers WHERE is_deleted = FALSE ORDER BY last_name, first_name');
   return rows;
 };
@@ -56,7 +56,7 @@ export const findDriversByCompany = async () => {
  * @param {number} driverId - ID kierowcy. * @param {number} companyId - ID firmy.
  * @returns {Promise<object|null>} Obiekt kierowcy lub null, jeśli nie znaleziono.
  */
-export const findDriverById = async (driverId) => {
+const findDriverById = async (driverId) => {
   const { rows } = await db.query('SELECT * FROM drivers WHERE id = $1 AND is_deleted = FALSE', [driverId]);
   return rows[0] || null;
 };
@@ -68,7 +68,7 @@ export const findDriverById = async (driverId) => {
  * @param {object} driverData - Nowe dane kierowcy. * @param {number} companyId - ID firmy.
  * @returns {Promise<object|null>} Zaktualizowany obiekt kierowcy lub null.
  */
-export const updateDriver = async (driverId, driverData) => {
+const updateDriver = async (driverId, driverData) => {
   const { first_name, last_name, phone_number = '', cpc_number = '', login_code = '', license_number = '', is_active } = driverData;
 
   const sql = `
@@ -96,12 +96,12 @@ export const updateDriver = async (driverId, driverData) => {
  * @param {number} driverId - ID kierowcy do usunięcia. * @param {number} companyId - ID firmy.
  * @returns {Promise<number>} Liczba usuniętych wierszy (0 lub 1).
  */
-export const deleteDriver = async (driverId) => {
+const deleteDriver = async (driverId) => {
   const result = await db.query('UPDATE drivers SET is_deleted = TRUE WHERE id = $1', [driverId]);
   return result.rowCount;
 };
 
-export const importDrivers = async (driversData) => {
+const importDrivers = async (driversData) => {
   return db.withTransaction(async (client) => {
     const importedDrivers = [];
     const errors = [];
@@ -152,4 +152,13 @@ export const importDrivers = async (driversData) => {
     }
     return { count: importedDrivers.length, importedIds: importedDrivers.map(d => d.id), errors };
   });
+};
+
+module.exports = {
+  createDriver,
+  findDriversByCompany,
+  findDriverById,
+  updateDriver,
+  deleteDriver,
+  importDrivers,
 };

@@ -1,15 +1,10 @@
 // Plik server/controllers/trailerController.js
-import * as trailerService from '../services/trailerService.js'; // Użyjemy serwisu
-import Papa from 'papaparse';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+const trailerService = require('../services/trailerService.js'); // Użyjemy serwisu
+const Papa = require('papaparse');
+const fs = require('fs');
+const path = require('path');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-
-export const getAllTrailers = async (req, res, next) => {
+exports.getAllTrailers = async (req, res, next) => {
   try {
     const trailers = await trailerService.findTrailersByCompany();
     res.json(trailers);
@@ -18,7 +13,7 @@ export const getAllTrailers = async (req, res, next) => {
   }
 };
 
-export const exportTrailers = async (req, res, next) => {
+exports.exportTrailers = async (req, res, next) => {
   try {
     const trailers = await trailerService.findTrailersByCompany();
     const csv = Papa.unparse(trailers);
@@ -41,7 +36,7 @@ export const exportTrailers = async (req, res, next) => {
   }
 };
 
-export const createTrailer = async (req, res, next) => {
+exports.createTrailer = async (req, res, next) => {
   try {
     const trailerData = req.body;
 
@@ -57,7 +52,7 @@ export const createTrailer = async (req, res, next) => {
   }
 };
 
-export const importTrailers = async (req, res, next) => {
+exports.importTrailers = async (req, res, next) => {
   try {
     const { trailers } = req.body;
     if (!trailers || !Array.isArray(trailers)) {
@@ -72,7 +67,7 @@ export const importTrailers = async (req, res, next) => {
   }
 };
 
-export const updateTrailer = async (req, res, next) => {
+exports.updateTrailer = async (req, res, next) => {
   try {
     const { trailerId } = req.params;
     const trailerData = req.body;
@@ -93,7 +88,7 @@ export const updateTrailer = async (req, res, next) => {
   }
 };
 
-export const deleteTrailer = async (req, res, next) => {
+exports.deleteTrailer = async (req, res, next) => {
   try {
     const { trailerId } = req.params;
     const changes = await trailerService.deleteTrailer(trailerId);

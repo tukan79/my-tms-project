@@ -1,7 +1,7 @@
 // Plik server/routes/postcodeZoneRoutes.js
-import express from 'express';
-import * as zoneController from '../controllers/postcodeZoneController.js';
-import { authenticateToken, requireRole } from '../middleware/authMiddleware.js';
+const express = require('express');
+const zoneController = require('../controllers/postcodeZoneController.js');
+const { authenticateToken, requireRole } = require('../middleware/authMiddleware.js');
 
 const router = express.Router();
 router.use(authenticateToken, requireRole(['admin']));
@@ -13,4 +13,4 @@ router.post('/', zoneController.createZone);
 router.put('/:zoneId', zoneController.updateZone);
 router.delete('/:zoneId', zoneController.deleteZone);
 
-export default router;
+module.exports = router;

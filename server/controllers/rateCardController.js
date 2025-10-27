@@ -1,6 +1,6 @@
 // Plik: server/controllers/rateCardController.js
-import * as rateCardService from '../services/rateCardService.js';
-import util from 'util'; // Importujemy moduł 'util'
+const rateCardService = require('../services/rateCardService.js');
+const util = require('util'); // Importujemy moduł 'util'
 
 // Helper function for consistent logging
 const log = (level, context, message, data = null) => {
@@ -19,7 +19,7 @@ const log = (level, context, message, data = null) => {
   console.log(JSON.stringify(logEntry, null, 2));
 };
 
-export const getAllRateCards = async (req, res, next) => {
+exports.getAllRateCards = async (req, res, next) => {
   const context = 'getAllRateCards';
   try {
     log('INFO', context, 'Fetching all rate cards');
@@ -32,7 +32,7 @@ export const getAllRateCards = async (req, res, next) => {
   }
 };
 
-export const createRateCard = async (req, res, next) => {
+exports.createRateCard = async (req, res, next) => {
   const context = 'createRateCard';
   try {
     log('INFO', context, 'Creating new rate card', { body: req.body });
@@ -45,7 +45,7 @@ export const createRateCard = async (req, res, next) => {
   }
 };
 
-export const updateRateCard = async (req, res, next) => {
+exports.updateRateCard = async (req, res, next) => {
   const context = 'updateRateCard';
   try {
     const { id } = req.params;
@@ -63,7 +63,7 @@ export const updateRateCard = async (req, res, next) => {
   }
 };
 
-export const getEntriesByRateCardId = async (req, res, next) => {
+exports.getEntriesByRateCardId = async (req, res, next) => {
   const context = 'getEntriesByRateCardId';
   try {
     const { id } = req.params;
@@ -77,7 +77,7 @@ export const getEntriesByRateCardId = async (req, res, next) => {
   }
 };
 
-export const getCustomersByRateCardId = async (req, res, next) => {
+exports.getCustomersByRateCardId = async (req, res, next) => {
   const context = 'getCustomersByRateCardId';
   try {
     const { id } = req.params;
@@ -91,7 +91,7 @@ export const getCustomersByRateCardId = async (req, res, next) => {
   }
 };
 
-export const assignCustomer = async (req, res, next) => {
+exports.assignCustomer = async (req, res, next) => {
   const context = 'assignCustomer';
   try {
     const { id: rateCardId, customerId } = req.params;
@@ -109,7 +109,7 @@ export const assignCustomer = async (req, res, next) => {
   }
 };
 
-export const assignCustomersBulk = async (req, res, next) => {
+exports.assignCustomersBulk = async (req, res, next) => {
   const context = 'assignCustomersBulk';
   try {
     const { id: rateCardId } = req.params;
@@ -126,7 +126,7 @@ export const assignCustomersBulk = async (req, res, next) => {
   }
 };
 
-export const unassignCustomer = async (req, res, next) => {
+exports.unassignCustomer = async (req, res, next) => {
   const context = 'unassignCustomer';
   try {
     const { id: rateCardId, customerId } = req.params;
@@ -144,7 +144,7 @@ export const unassignCustomer = async (req, res, next) => {
   }
 };
 
-export const importRateEntries = async (req, res, next) => {
+exports.importRateEntries = async (req, res, next) => {
   const context = 'importRateEntries';
   try {
     const { id: rateCardId } = req.params;
@@ -195,7 +195,7 @@ export const importRateEntries = async (req, res, next) => {
 };
 
 // Debug endpoint to check zone mapping
-export const debugZones = async (req, res, next) => {
+exports.debugZones = async (req, res, next) => {
   const context = 'debugZones';
   try {
     log('INFO', context, 'Debugging zone mapping');
@@ -208,7 +208,7 @@ export const debugZones = async (req, res, next) => {
 };
 
 // Check zone mapping for specific CSV data
-export const checkZoneMapping = async (req, res, next) => {
+exports.checkZoneMapping = async (req, res, next) => {
   const context = 'checkZoneMapping';
   try {
     const { zoneNames } = req.body; // Array of zone names from CSV

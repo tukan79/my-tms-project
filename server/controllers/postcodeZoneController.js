@@ -1,14 +1,10 @@
 // Plik server/controllers/postcodeZoneController.js
-import * as zoneService from '../services/postcodeZoneService.js'; // Poprawiony import
-import Papa from 'papaparse';
-import fs from 'fs'; // Moduł do operacji na plikach
-import path from 'path';
-import { fileURLToPath } from 'url';
+const zoneService = require('../services/postcodeZoneService.js'); // Poprawiony import
+const Papa = require('papaparse');
+const fs = require('fs'); // Moduł do operacji na plikach
+const path = require('path');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-export const getAllZones = async (req, res, next) => {
+exports.getAllZones = async (req, res, next) => {
   try {
     const zones = await zoneService.findAllZones();
     res.json(zones);
@@ -17,7 +13,7 @@ export const getAllZones = async (req, res, next) => {
   }
 };
 
-export const createZone = async (req, res, next) => {
+exports.createZone = async (req, res, next) => {
   try {
     if (!req.body.zone_name) {
       return res.status(400).json({ error: 'Zone name is required.' });
@@ -29,7 +25,7 @@ export const createZone = async (req, res, next) => {
   }
 };
 
-export const updateZone = async (req, res, next) => {
+exports.updateZone = async (req, res, next) => {
   try {
     const updatedZone = await zoneService.updateZone(req.params.zoneId, req.body);
     if (!updatedZone) {
@@ -41,7 +37,7 @@ export const updateZone = async (req, res, next) => {
   }
 };
 
-export const deleteZone = async (req, res, next) => {
+exports.deleteZone = async (req, res, next) => {
   try {
     const changes = await zoneService.deleteZone(req.params.zoneId);
     if (changes === 0) {
@@ -53,7 +49,7 @@ export const deleteZone = async (req, res, next) => {
   }
 };
 
-export const exportZones = async (req, res, next) => {
+exports.exportZones = async (req, res, next) => {
   try {
     console.log('[Export] 1/6: Starting export process...');
     const zones = await zoneService.findAllZones();
@@ -97,7 +93,7 @@ export const exportZones = async (req, res, next) => {
   }
 };
 
-export const importZones = async (req, res, next) => {
+exports.importZones = async (req, res, next) => {
   try {
     // Oczekujemy, że dane będą w obiekcie pod kluczem zdefiniowanym w `postDataKey`
     const zonesData = req.body.zones || req.body;
@@ -111,7 +107,7 @@ export const importZones = async (req, res, next) => {
   }
 };
 
-export const seedZones = async (req, res, next) => {
+exports.seedZones = async (req, res, next) => {
   // Ta funkcja powinna być dostępna tylko w środowisku deweloperskim
   if (process.env.NODE_ENV === 'production') {
     return res.status(403).json({ error: 'This feature is only available in development mode.' });

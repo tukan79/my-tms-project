@@ -1,7 +1,7 @@
 // Plik server/services/assignmentService.js
-import db from '../db/index.js';
+const db = require('../db/index.js');
 
-export const createAssignment = async ({ order_id, run_id, notes }) => {
+const createAssignment = async ({ order_id, run_id, notes }) => {
   // Używamy transakcji, aby zapewnić, że obie operacje (wstawienie i aktualizacja) powiodą się lub żadna.
   return db.withTransaction(async (client) => {
     // Krok 1: Wstaw nowe przypisanie
@@ -23,12 +23,12 @@ export const createAssignment = async ({ order_id, run_id, notes }) => {
   });
 };
 
-export const findAllAssignments = async () => {
+const findAllAssignments = async () => {
   const { rows } = await db.query('SELECT * FROM assignments WHERE is_deleted = FALSE ORDER BY created_at DESC');
   return rows;
 };
 
-export const deleteAssignment = async (assignmentId) => {
+const deleteAssignment = async (assignmentId) => {
   // Używamy transakcji, aby zapewnić spójność danych
   return db.withTransaction(async (client) => {
     // Krok 1: Znajdź przypisanie, aby uzyskać order_id
@@ -52,7 +52,7 @@ export const deleteAssignment = async (assignmentId) => {
   });
 };
 
-export const bulkCreateAssignments = async (run_id, order_ids) => {
+const bulkCreateAssignments = async (run_id, order_ids) => {
   // Używamy transakcji, aby zapewnić, że wszystkie przypisania zostaną utworzone, albo żadne.
   return db.withTransaction(async (client) => {
     // Krok 1: Usuń istniejące przypisania dla tych zleceń, aby uniknąć konfliktów.
@@ -80,4 +80,11 @@ export const bulkCreateAssignments = async (run_id, order_ids) => {
 
     return { createdCount };
   });
+};
+
+module.exports = {
+  createAssignment,
+  findAllAssignments,
+  deleteAssignment,
+  bulkCreateAssignments,
 };

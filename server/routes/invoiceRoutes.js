@@ -1,7 +1,7 @@
 // Plik: server/routes/invoiceRoutes.js
-import express from 'express';
-import { authenticateToken, requireRole } from '../middleware/authMiddleware.js';
-import * as invoiceController from '../controllers/invoiceController.js';
+const express = require('express');
+const { authenticateToken, requireRole } = require('../middleware/authMiddleware.js');
+const invoiceController = require('../controllers/invoiceController.js');
 
 // Wszystkie trasy dla faktur wymagają uwierzytelnienia i roli admina lub dyspozytora
 const router = express.Router();
@@ -11,4 +11,4 @@ router.post('/', invoiceController.createInvoice);
 router.get('/', invoiceController.getAllInvoices);
 router.get('/:id/pdf', invoiceController.downloadInvoicePDF);
 
-export default router;
+module.exports = router;

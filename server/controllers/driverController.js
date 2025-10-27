@@ -1,15 +1,11 @@
 // Plik server/controllers/driverController.js
-import * as driverService from '../services/driverService.js';
-import Papa from 'papaparse';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const driverService = require('../services/driverService.js');
+const Papa = require('papaparse');
+const fs = require('fs');
+const path = require('path');
 
 
-export const getAllDrivers = async (req, res, next) => {
+exports.getAllDrivers = async (req, res, next) => {
   try {
     const drivers = await driverService.findDriversByCompany(); 
     res.status(200).json(drivers);
@@ -18,7 +14,7 @@ export const getAllDrivers = async (req, res, next) => {
   }
 };
 
-export const exportDrivers = async (req, res, next) => {
+exports.exportDrivers = async (req, res, next) => {
   try {
     const drivers = await driverService.findDriversByCompany();
     const csv = Papa.unparse(drivers);
@@ -41,7 +37,7 @@ export const exportDrivers = async (req, res, next) => {
   }
 };
 
-export const importDrivers = async (req, res, next) => {
+exports.importDrivers = async (req, res, next) => {
   try {
     const result = await driverService.importDrivers(req.body);
     res.status(201).json({ message: `Successfully processed ${result.count} drivers.`, ...result });
@@ -50,7 +46,7 @@ export const importDrivers = async (req, res, next) => {
   }
 };
 
-export const createDriver = async (req, res, next) => {
+exports.createDriver = async (req, res, next) => {
   try {
     // Prosta walidacja - można ją rozbudować
     if (!req.body.first_name || !req.body.last_name) {
@@ -63,7 +59,7 @@ export const createDriver = async (req, res, next) => {
   }
 };
 
-export const updateDriver = async (req, res, next) => {
+exports.updateDriver = async (req, res, next) => {
   try {
     const { driverId } = req.params;
     const driverData = req.body;
@@ -85,7 +81,7 @@ export const updateDriver = async (req, res, next) => {
   }
 };
 
-export const deleteDriver = async (req, res, next) => {
+exports.deleteDriver = async (req, res, next) => {
   try {
     const { driverId } = req.params;
 

@@ -1,7 +1,7 @@
 // Plik server/services/customerService.js
-import db from '../db/index.js';
+const db = require('../db/index.js');
 
-export const createCustomer = async (customerData) => {
+const createCustomer = async (customerData) => {
   const { 
     name, customer_code, address_line1, address_line2, address_line3, address_line4, 
     postcode, phone_number, country_code, category, currency, vat_number, payment_terms, status,
@@ -23,12 +23,12 @@ export const createCustomer = async (customerData) => {
   return rows[0];
 };
 
-export const findAllCustomers = async () => {
+const findAllCustomers = async () => {
   const { rows } = await db.query('SELECT * FROM customers WHERE is_deleted = FALSE ORDER BY name');
   return rows;
 };
 
-export const updateCustomer = async (customerId, customerData) => {
+const updateCustomer = async (customerId, customerData) => {
   const { 
     name, customer_code, address_line1, address_line2, address_line3, address_line4, 
     postcode, phone_number, country_code, category, currency, vat_number, payment_terms, status,
@@ -50,13 +50,13 @@ export const updateCustomer = async (customerId, customerData) => {
   return rows.length > 0 ? rows[0] : null;
 };
 
-export const deleteCustomer = async (customerId) => {
+const deleteCustomer = async (customerId) => {
   const sql = 'UPDATE customers SET is_deleted = TRUE WHERE id = $1';
   const result = await db.query(sql, [customerId]);
   return result.rowCount;
 };
 
-export const importCustomers = async (customersData) => {
+const importCustomers = async (customersData) => {
   return db.withTransaction(async (client) => {
     const importedCustomers = [];
     const errors = [];
@@ -131,4 +131,12 @@ export const importCustomers = async (customersData) => {
     }
     return { count: importedCustomers.length, importedIds: importedCustomers.map(c => c.id), errors };
   });
+};
+
+module.exports = {
+  createCustomer,
+  findAllCustomers,
+  updateCustomer,
+  deleteCustomer,
+  importCustomers,
 };

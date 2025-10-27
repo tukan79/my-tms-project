@@ -1,7 +1,7 @@
 // Plik server/routes/customerRoutes.js
-import express from 'express';
-import * as customerController from '../controllers/customerController.js';
-import { authenticateToken, requireRole } from '../middleware/authMiddleware.js';
+const express = require('express');
+const customerController = require('../controllers/customerController.js');
+const { authenticateToken, requireRole } = require('../middleware/authMiddleware.js');
 
 // Wszystkie trasy chronione, dostępne tylko dla admina
 const router = express.Router();
@@ -14,4 +14,4 @@ router.post('/import', customerController.importCustomers);
 router.put('/:customerId', customerController.updateCustomer);
 router.delete('/:customerId', customerController.deleteCustomer);
 
-export default router;
+module.exports = router;

@@ -1,7 +1,7 @@
 // Plik server/routes/trailerRoutes.js
-import express from 'express';
-import * as trailerController from '../controllers/trailerController.js';
-import { authenticateToken, requireRole } from '../middleware/authMiddleware.js';
+const express = require('express');
+const trailerController = require('../controllers/trailerController.js');
+const { authenticateToken, requireRole } = require('../middleware/authMiddleware.js');
 
 const router = express.Router();
 router.use(authenticateToken, requireRole(['admin']));
@@ -13,4 +13,4 @@ router.post('/', trailerController.createTrailer);
 router.put('/:trailerId', trailerController.updateTrailer);
 router.delete('/:trailerId', trailerController.deleteTrailer);
 
-export default router;
+module.exports = router;

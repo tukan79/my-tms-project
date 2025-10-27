@@ -1,12 +1,12 @@
 // Plik server/controllers/authController.js
-import validator from 'validator';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { body, validationResult } from 'express-validator';
-import * as userService from '../services/userService.js';
-import { isStrongPassword, passwordStrengthMessage } from '../utils/validation.js';
+const validator = require('validator');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const { body, validationResult } = require('express-validator');
+const userService = require('../services/userService.js');
+const { isStrongPassword, passwordStrengthMessage } = require('../utils/validation.js');
 
-export const registerValidation = [
+const registerValidation = [
   body('email').isEmail().withMessage('Please provide a valid email.').normalizeEmail(),
   body('firstName').not().isEmpty().withMessage('First name is required.').trim().escape(),
   body('lastName').not().isEmpty().withMessage('Last name is required.').trim().escape(),
@@ -18,7 +18,7 @@ export const registerValidation = [
   })
 ];
 
-export const register = async (req, res, next) => {
+const register = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -43,12 +43,12 @@ export const register = async (req, res, next) => {
   }
 };
 
-export const loginValidation = [
+const loginValidation = [
   body('email').isEmail().withMessage('Please provide a valid email.').normalizeEmail(),
   body('password').not().isEmpty().withMessage('Password cannot be empty.')
 ];
 
-export const login = async (req, res, next) => {
+const login = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
@@ -95,7 +95,7 @@ export const login = async (req, res, next) => {
   }
 };
 
-export const verifyToken = async (req, res, next) => {
+const verifyToken = async (req, res, next) => {
   try {
     // Jeśli middleware authenticateToken przeszedł, token jest ważny.
     // If the authenticateToken middleware has passed, the token is valid.
@@ -119,7 +119,16 @@ export const verifyToken = async (req, res, next) => {
 };
 
 // Opcjonalnie: wylogowanie
-export const logout = (req, res) => {
+const logout = (req, res) => {
   // Wylogowanie po stronie klienta polega na usunięciu tokenu z localStorage
   return res.json({ message: 'Logged out.' });
+};
+
+module.exports = {
+  registerValidation,
+  register,
+  loginValidation,
+  login,
+  verifyToken,
+  logout
 };

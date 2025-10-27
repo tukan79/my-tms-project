@@ -1,12 +1,12 @@
 // Plik: server/services/surchargeTypeService.js
-import db from '../db/index.js';
+const db = require('../db/index.js');
 
-export const findAll = async () => {
+const findAll = async () => {
   const { rows } = await db.query('SELECT * FROM surcharge_types ORDER BY name');
   return rows;
 };
 
-export const create = async (surchargeData) => {
+const create = async (surchargeData) => {
   const { code, name, description, calculation_method, amount, is_automatic, requires_time, start_time, end_time } = surchargeData;
   const sql = `
     INSERT INTO surcharge_types (code, name, description, calculation_method, amount, is_automatic, requires_time, start_time, end_time)
@@ -16,7 +16,7 @@ export const create = async (surchargeData) => {
   return rows[0];
 };
 
-export const update = async (id, surchargeData) => {
+const update = async (id, surchargeData) => {
   const { code, name, description, calculation_method, amount, is_automatic, requires_time, start_time, end_time } = surchargeData;
   const sql = `
     UPDATE surcharge_types
@@ -27,7 +27,14 @@ export const update = async (id, surchargeData) => {
   return rows[0] || null;
 };
 
-export const deleteById = async (id) => {
+const deleteById = async (id) => {
   const result = await db.query('DELETE FROM surcharge_types WHERE id = $1', [id]);
   return result.rowCount;
+};
+
+module.exports = {
+  findAll,
+  create,
+  update,
+  deleteById,
 };

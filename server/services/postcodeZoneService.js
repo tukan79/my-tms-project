@@ -1,7 +1,7 @@
 // Plik server/services/postcodeZoneService.js
-import db from '../db/index.js';
+const db = require('../db/index.js');
 
-export const createZone = async (zoneData) => {
+const createZone = async (zoneData) => {
   const { zone_name, postcode_patterns, is_home_zone } = zoneData;
   const sql = `
     INSERT INTO postcode_zones (zone_name, postcode_patterns, is_home_zone)
@@ -11,12 +11,12 @@ export const createZone = async (zoneData) => {
   return rows[0];
 };
 
-export const findAllZones = async () => {
+const findAllZones = async () => {
   const { rows } = await db.query('SELECT * FROM postcode_zones ORDER BY zone_name');
   return rows;
 };
 
-export const updateZone = async (zoneId, zoneData) => {
+const updateZone = async (zoneId, zoneData) => {
   const { zone_name, postcode_patterns, is_home_zone } = zoneData;
   const sql = `
     UPDATE postcode_zones
@@ -27,13 +27,13 @@ export const updateZone = async (zoneId, zoneData) => {
   return rows.length > 0 ? rows[0] : null;
 };
 
-export const deleteZone = async (zoneId) => {
+const deleteZone = async (zoneId) => {
   // W przyszłości można dodać walidację, czy strefa nie jest używana w żadnym cenniku
   const result = await db.query('DELETE FROM postcode_zones WHERE id = $1', [zoneId]);
   return result.rowCount;
 };
 
-export const importZones = async (zonesData) => {
+const importZones = async (zonesData) => {
   return db.withTransaction(async (client) => {
     const importedZones = [];
     // Używamy ON CONFLICT, aby aktualizować istniejące strefy lub tworzyć nowe
@@ -64,4 +64,12 @@ export const importZones = async (zonesData) => {
     }
     return { count: importedZones.length };
   });
+};
+
+module.exports = {
+  createZone,
+  findAllZones,
+  updateZone,
+  deleteZone,
+  importZones,
 };

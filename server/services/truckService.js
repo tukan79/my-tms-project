@@ -1,7 +1,7 @@
 // server/services/truckService.js
-import db from '../db/index.js';
+const db = require('../db/index.js');
 
-export const createTruck = async (truckData) => {
+const createTruck = async (truckData) => {
   const {
     registration_plate, brand, model, vin, production_year,
     type_of_truck, total_weight, pallet_capacity, max_payload_kg, is_active
@@ -22,12 +22,12 @@ export const createTruck = async (truckData) => {
   }
 };
 
-export const findTrucksByCompany = async () => {
+const findTrucksByCompany = async () => {
   const { rows } = await db.query('SELECT * FROM trucks WHERE is_deleted = FALSE ORDER BY brand, model');
   return rows;
 };
 
-export const updateTruck = async (truckId, truckData) => {
+const updateTruck = async (truckId, truckData) => {
   const {
     registration_plate, brand, model, vin, production_year,
     type_of_truck, total_weight, pallet_capacity, max_payload_kg, is_active
@@ -42,17 +42,17 @@ export const updateTruck = async (truckId, truckData) => {
   return rows.length > 0 ? rows[0] : null;
 };
 
-export const deleteTruck = async (truckId) => {
+const deleteTruck = async (truckId) => {
   const result = await db.query('UPDATE trucks SET is_deleted = TRUE WHERE id = $1', [truckId]);
   return result.rowCount;
 };
 
-export const toInt = (value) => {
+const toInt = (value) => {
   const num = parseInt(value, 10);
   return isNaN(num) ? null : num;
 };
 
-export const importTrucks = async (trucksData) => {
+const importTrucks = async (trucksData) => {
   return db.withTransaction(async (client) => {
     const importedTrucks = [];
     const sql = `
@@ -98,4 +98,13 @@ export const importTrucks = async (trucksData) => {
 
     return { importedCount: importedTrucks.length, importedIds: importedTrucks.map(t => t.id) };
   });
+};
+
+module.exports = {
+  createTruck,
+  findTrucksByCompany,
+  updateTruck,
+  deleteTruck,
+  toInt,
+  importTrucks,
 };

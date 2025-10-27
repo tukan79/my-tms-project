@@ -1,5 +1,5 @@
 // Plik server/services/pricingService.js
-import db from '../db/index.js';
+const db = require('../db/index.js');
 
 // Stałe dla typów stawek i poziomów usług
 const RATE_TYPES = {
@@ -292,4 +292,6 @@ const calculateOrderPrice = async (order) => {
   return result;
 };
 
-export default { calculateOrderPrice };
+module.exports = {
+  calculateOrderPrice,
+};

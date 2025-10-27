@@ -1,4 +1,4 @@
-import db from '../db/index.js';
+const db = require('../db/index.js');
 
 // Helper function for consistent logging within the service
 const logService = (level, context, message, data = null) => {
@@ -19,7 +19,7 @@ const logService = (level, context, message, data = null) => {
  * @param {number} customerId - The ID of the customer.
  * @returns {Promise<object|null>} The rate card object or null if not found.
  */
-export const findRateCardByCustomerId = async (customerId) => {
+const findRateCardByCustomerId = async (customerId) => {
   const context = 'findRateCardByCustomerId';
   try {
     logService('INFO', context, 'Finding rate card for customer', { customerId });
@@ -50,7 +50,7 @@ export const findRateCardByCustomerId = async (customerId) => {
  * Finds all available rate cards.
  * @returns {Promise<Array>} A list of all rate cards.
  */
-export const findAllRateCards = async () => {
+const findAllRateCards = async () => {
   const context = 'findAllRateCards';
   try {
     logService('INFO', context, 'Fetching all rate cards');
@@ -64,7 +64,7 @@ export const findAllRateCards = async () => {
   }
 };
 
-export const createRateCard = async ({ name }) => {
+const createRateCard = async ({ name }) => {
   const context = 'createRateCard';
   try {
     if (!name || name.trim() === '') {
@@ -86,7 +86,7 @@ export const createRateCard = async ({ name }) => {
   }
 };
 
-export const updateRateCard = async (id, { name, price }) => {
+const updateRateCard = async (id, { name, price }) => {
   const context = 'updateRateCard';
   try {
     logService('INFO', context, 'Updating rate card', { id, updates: { name, price } });
@@ -136,7 +136,7 @@ export const updateRateCard = async (id, { name, price }) => {
  * @param {string} priceStr - Price as string with possible commas
  * @returns {number} Price in micro units
  */
-export const parsePrice = (priceStr) => {
+const parsePrice = (priceStr) => {
   if (priceStr === null || priceStr === undefined || priceStr === '') return 0;
 
   // Usuń wszystkie znaki niebędące cyframi, kropkami lub przecinkami
@@ -154,11 +154,11 @@ export const parsePrice = (priceStr) => {
  * @param {string[]} keys - An array of keys to try.
  * @returns {any|undefined} The value of the first found key, or undefined.
  */
-export const findValueByKeys = (obj, keys) => {
+const findValueByKeys = (obj, keys) => {
   for (const key of keys) if (obj[key] !== undefined) return obj[key];
 };
 
-export const importRateEntries = async (rateCardId, entries) => {
+const importRateEntries = async (rateCardId, entries) => {
   const context = 'importRateEntries';
   
   // Walidacja wejścia
@@ -330,7 +330,7 @@ export const importRateEntries = async (rateCardId, entries) => {
   });
 };
 
-export const findEntriesByRateCardId = async (rateCardId) => {
+const findEntriesByRateCardId = async (rateCardId) => {
   const context = 'findEntriesByRateCardId';
   try {
     logService('INFO', context, 'Finding rate entries for rate card', { rateCardId });
@@ -350,7 +350,7 @@ export const findEntriesByRateCardId = async (rateCardId) => {
   }
 };
 
-export const findCustomersByRateCardId = async (rateCardId) => {
+const findCustomersByRateCardId = async (rateCardId) => {
   const context = 'findCustomersByRateCardId';
   try {
     logService('INFO', context, 'Finding customers for rate card', { rateCardId });
@@ -370,7 +370,7 @@ export const findCustomersByRateCardId = async (rateCardId) => {
   }
 };
 
-export const assignCustomerToRateCard = async (rateCardId, customerId) => {
+const assignCustomerToRateCard = async (rateCardId, customerId) => {
   const context = 'assignCustomerToRateCard';
   try {
     logService('INFO', context, 'Assigning customer to rate card', { rateCardId, customerId });
@@ -390,7 +390,7 @@ export const assignCustomerToRateCard = async (rateCardId, customerId) => {
   }
 };
 
-export const unassignCustomerFromRateCard = async (rateCardId, customerId) => {
+const unassignCustomerFromRateCard = async (rateCardId, customerId) => {
   const context = 'unassignCustomerFromRateCard';
   try {
     logService('INFO', context, 'Unassigning customer from rate card', { rateCardId, customerId });
@@ -408,7 +408,7 @@ export const unassignCustomerFromRateCard = async (rateCardId, customerId) => {
   }
 };
 
-export const assignCustomersToRateCardBulk = async (rateCardId, customerIds) => {
+const assignCustomersToRateCardBulk = async (rateCardId, customerIds) => {
   const context = 'assignCustomersToRateCardBulk';
   logService('INFO', context, 'Bulk assigning customers to rate card', { rateCardId, customerIds });
 
@@ -436,7 +436,7 @@ export const assignCustomersToRateCardBulk = async (rateCardId, customerIds) => 
 };
 
 // Dodatkowa funkcja do sprawdzenia struktury stref w bazie
-export const getZoneMappingInfo = async () => {
+const getZoneMappingInfo = async () => {
   const context = 'getZoneMappingInfo';
   try {
     logService('INFO', context, 'Fetching zone mapping info');
@@ -451,7 +451,7 @@ export const getZoneMappingInfo = async () => {
 };
 
 // Funkcja do debugowania - sprawdź jakie strefy są dostępne
-export const debugZoneMapping = async () => {
+const debugZoneMapping = async () => {
   const context = 'debugZoneMapping';
   try {
     logService('INFO', context, 'Debugging zone mapping');
@@ -462,4 +462,21 @@ export const debugZoneMapping = async () => {
     logService('ERROR', context, 'Error debugging zone mapping', { error: error.message });
     throw error;
   }
+};
+
+module.exports = {
+  findRateCardByCustomerId,
+  findAllRateCards,
+  createRateCard,
+  updateRateCard,
+  parsePrice,
+  findValueByKeys,
+  importRateEntries,
+  findEntriesByRateCardId,
+  findCustomersByRateCardId,
+  assignCustomerToRateCard,
+  unassignCustomerFromRateCard,
+  assignCustomersToRateCardBulk,
+  getZoneMappingInfo,
+  debugZoneMapping,
 };

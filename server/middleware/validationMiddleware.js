@@ -1,5 +1,5 @@
 // Plik: server/middleware/validationMiddleware.js
-import { body, validationResult } from 'express-validator';
+const { body, validationResult } = require('express-validator');
 
 // Middleware do obsługi błędów walidacji
 const handleValidationErrors = (req, res, next) => {
@@ -13,7 +13,7 @@ const handleValidationErrors = (req, res, next) => {
 };
 
 // Walidacja dla tworzenia i aktualizacji przejazdu (run)
-export const validateRun = [
+exports.validateRun = [
   body('run_date')
     .isISO8601()
     .withMessage('A valid run date is required.'),
@@ -31,7 +31,7 @@ export const validateRun = [
 ];
 
 // Walidacja dla tworzenia i aktualizacji zamówienia (order)
-export const validateOrder = [
+exports.validateOrder = [
   body('client_id')
     .isInt({ min: 1 })
     .withMessage('A valid client ID is required.'),

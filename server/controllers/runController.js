@@ -1,8 +1,8 @@
 // Plik server/controllers/runController.js
-import * as runService from '../services/runService.js';
-import * as manifestService from '../services/manifestService.js';
+const runService = require('../services/runService.js');
+const manifestService = require('../services/manifestService.js');
 
-export const getAllRuns = async (req, res, next) => {
+exports.getAllRuns = async (req, res, next) => {
   try {
     // Przekazujemy filtry z zapytania (np. ?date=YYYY-MM-DD) do serwisu
     const filters = req.query;
@@ -13,7 +13,7 @@ export const getAllRuns = async (req, res, next) => {
   }
 };
 
-export const generateManifest = async (req, res, next) => {
+exports.generateManifest = async (req, res, next) => {
   try {
     const { id } = req.params;
     console.log(`[runController] Otrzymano żądanie wygenerowania manifestu dla przejazdu o ID: ${id}`);
@@ -30,7 +30,7 @@ export const generateManifest = async (req, res, next) => {
   }
 };
 
-export const createRun = async (req, res, next) => {
+exports.createRun = async (req, res, next) => {
   try {
     const newRun = await runService.createRun(req.body);
     res.status(201).json(newRun);
@@ -39,7 +39,7 @@ export const createRun = async (req, res, next) => {
   }
 };
 
-export const deleteRun = async (req, res, next) => {
+exports.deleteRun = async (req, res, next) => {
   try {
     const { id } = req.params;
     console.log(`[runController] Otrzymano żądanie usunięcia przejazdu o ID: ${id}`);
@@ -55,7 +55,7 @@ export const deleteRun = async (req, res, next) => {
   }
 };
 
-export const updateStatus = async (req, res, next) => {
+exports.updateStatus = async (req, res, next) => {
   try {
     const { id } = req.params; // Zmiana z runId na id
     const { status } = req.body;
@@ -75,7 +75,7 @@ export const updateStatus = async (req, res, next) => {
   }
 };
 
-export const updateRun = async (req, res, next) => {
+exports.updateRun = async (req, res, next) => {
   try {
     const { id } = req.params; // Zmiana z runId na id
     const updatedRun = await runService.updateRun(id, req.body);

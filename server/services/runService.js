@@ -1,7 +1,7 @@
 // Plik server/services/runService.js
-import db from '../db/index.js';
+const db = require('../db/index.js');
 
-export const createRun = async (runData) => {
+const createRun = async (runData) => {
   const { run_date, type, truck_id, trailer_id, driver_id } = runData;
   // Poprawka: Jeśli trailer_id jest pustym stringiem, zamień go na null.
   const sql = `
@@ -12,7 +12,7 @@ export const createRun = async (runData) => {
   return rows[0];
 };
 
-export const findAllRuns = async (filters = {}) => {
+const findAllRuns = async (filters = {}) => {
   // Poprawka: Formatujemy datę bezpośrednio w zapytaniu SQL do stringa 'YYYY-MM-DD'.
   // To eliminuje wszystkie problemy ze strefami czasowymi po stronie klienta.
   let sql = `
@@ -36,7 +36,7 @@ export const findAllRuns = async (filters = {}) => {
   return rows;
 };
 
-export const deleteRun = async (id) => {
+const deleteRun = async (id) => {
   // Używamy "soft delete" dla spójności i bezpieczeństwa danych.
   // We use "soft delete" for data consistency and safety.
   console.log(`[runService] Próba usunięcia (soft delete) przejazdu o ID: ${id}`);
@@ -48,7 +48,7 @@ export const deleteRun = async (id) => {
   return result.rowCount;
 };
 
-export const updateRunStatus = async (runId, status) => {
+const updateRunStatus = async (runId, status) => {
   const allowedStatuses = ['planned', 'in_progress', 'completed'];
   if (!allowedStatuses.includes(status)) {
     // Rzucamy błąd, jeśli status jest nieprawidłowy
@@ -65,7 +65,7 @@ export const updateRunStatus = async (runId, status) => {
   return rows[0] || null; // Zwraca zaktualizowany przejazd lub null, jeśli nie znaleziono
 };
 
-export const updateRun = async (runId, runData) => {
+const updateRun = async (runId, runData) => {
   const { run_date, type, truck_id, trailer_id, driver_id } = runData;
   const sql = `
     UPDATE runs
@@ -81,4 +81,12 @@ export const updateRun = async (runId, runData) => {
   `;
   const { rows } = await db.query(sql, [run_date, type, truck_id, trailer_id || null, driver_id, runId]);
   return rows[0] || null;
+};
+
+module.exports = {
+  createRun,
+  findAllRuns,
+  deleteRun,
+  updateRunStatus,
+  updateRun,
 };

@@ -1,5 +1,5 @@
 // Plik: server/services/feedbackService.js
-import nodemailer from 'nodemailer';
+const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
   host: process.env.EMAIL_HOST,
@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-export const sendBugReportEmail = async (description, context) => {
+const sendBugReportEmail = async (description, context) => {
   const { reportingUser, url, userAgent } = context;
 
   const subject = `[MyTMS Bug Report] - Issue from ${reportingUser.email}`;
@@ -51,4 +51,8 @@ export const sendBugReportEmail = async (description, context) => {
     // Rzucamy błąd dalej, aby kontroler mógł go obsłużyć
     throw new Error('Failed to send email. Please check server configuration.');
   }
+};
+
+module.exports = {
+  sendBugReportEmail,
 };

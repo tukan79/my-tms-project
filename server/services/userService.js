@@ -1,7 +1,7 @@
-import db from '../db/index.js';
-import bcrypt from 'bcryptjs';
+const db = require('../db/index.js');
+const bcrypt = require('bcryptjs');
 
-export const createUser = async (userData) => {
+const createUser = async (userData) => {
   const { email, password, role, first_name, last_name } = userData;
   const password_hash = await bcrypt.hash(password, 10);
   const sql = `
@@ -12,17 +12,17 @@ export const createUser = async (userData) => {
   return rows[0];
 };
 
-export const findAllUsers = async () => {
+const findAllUsers = async () => {
   const { rows } = await db.query('SELECT id, email, first_name, last_name, role, created_at FROM users WHERE is_deleted = FALSE ORDER BY last_name, first_name');
   return rows;
 };
 
-export const findUserByEmailWithPassword = async (email) => {
+const findUserByEmailWithPassword = async (email) => {
   const { rows } = await db.query('SELECT * FROM users WHERE email = $1 AND is_deleted = FALSE', [email]);
   return rows[0] || null;
 };
 
-export const findUserById = async (userId) => {
+const findUserById = async (userId) => {
   const { rows } = await db.query(
     'SELECT id, email, role, first_name, last_name FROM users WHERE id = $1 AND is_deleted = FALSE',
     [userId]
@@ -30,7 +30,7 @@ export const findUserById = async (userId) => {
   return rows[0] || null;
 };
 
-export const updateUser = async (userId, userData) => {
+const updateUser = async (userId, userData) => {
   const { first_name, last_name, role, password } = userData;
 
   const fieldsToUpdate = {};
@@ -64,12 +64,12 @@ export const updateUser = async (userId, userData) => {
   return rows[0] || null;
 };
 
-export const deleteUser = async (userId) => {
+const deleteUser = async (userId) => {
   const result = await db.query('UPDATE users SET is_deleted = TRUE WHERE id = $1', [userId]);
   return result.rowCount;
 };
 
-export const importUsers = async (usersData) => {
+const importUsers = async (usersData) => {
   return db.withTransaction(async (client) => {
     const importedUsers = [];
     const errors = [];
@@ -114,4 +114,14 @@ export const importUsers = async (usersData) => {
     }
     return { count: importedUsers.length, importedIds: importedUsers.map(u => u.id), errors };
   });
+};
+
+module.exports = {
+  createUser,
+  findAllUsers,
+  findUserByEmailWithPassword,
+  findUserById,
+  updateUser,
+  deleteUser,
+  importUsers
 };

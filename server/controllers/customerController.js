@@ -1,14 +1,10 @@
 // Plik server/controllers/customerController.js
-import * as customerService from '../services/customerService.js';
-import Papa from 'papaparse';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+const customerService = require('../services/customerService.js');
+const Papa = require('papaparse');
+const fs = require('fs');
+const path = require('path');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-export const getAllCustomers = async (req, res, next) => {
+exports.getAllCustomers = async (req, res, next) => {
   try {
     const customers = await customerService.findAllCustomers();
     res.json(customers);
@@ -17,7 +13,7 @@ export const getAllCustomers = async (req, res, next) => {
   }
 };
 
-export const exportCustomers = async (req, res, next) => {
+exports.exportCustomers = async (req, res, next) => {
   try {
     const customers = await customerService.findAllCustomers();
     const csv = Papa.unparse(customers);
@@ -40,7 +36,7 @@ export const exportCustomers = async (req, res, next) => {
   }
 };
 
-export const createCustomer = async (req, res, next) => {
+exports.createCustomer = async (req, res, next) => {
   try {
     if (!req.body.name) {
       return res.status(400).json({ error: 'Customer name is required.' });
@@ -52,7 +48,7 @@ export const createCustomer = async (req, res, next) => {
   }
 };
 
-export const updateCustomer = async (req, res, next) => {
+exports.updateCustomer = async (req, res, next) => {
   try {
     const updatedCustomer = await customerService.updateCustomer(req.params.customerId, req.body);
     if (!updatedCustomer) {
@@ -64,7 +60,7 @@ export const updateCustomer = async (req, res, next) => {
   }
 };
 
-export const deleteCustomer = async (req, res, next) => {
+exports.deleteCustomer = async (req, res, next) => {
   try {
     const changes = await customerService.deleteCustomer(req.params.customerId);
     if (changes === 0) {
@@ -76,7 +72,7 @@ export const deleteCustomer = async (req, res, next) => {
   }
 };
 
-export const importCustomers = async (req, res, next) => {
+exports.importCustomers = async (req, res, next) => {
   try {
     const result = await customerService.importCustomers(req.body);
     res.status(201).json({ message: `Successfully imported ${result.count} customers.`, ...result });

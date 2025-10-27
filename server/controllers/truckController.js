@@ -1,15 +1,10 @@
 // Plik server/controllers/truckController.js
-import * as truckService from '../services/truckService.js'; // Użyjemy serwisu
-import Papa from 'papaparse';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+const truckService = require('../services/truckService.js'); // Użyjemy serwisu
+const Papa = require('papaparse');
+const fs = require('fs');
+const path = require('path');
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-
-export const getAllTrucks = async (req, res, next) => {
+exports.getAllTrucks = async (req, res, next) => {
   try {
     const trucks = await truckService.findTrucksByCompany();
     res.json(trucks);
@@ -18,7 +13,7 @@ export const getAllTrucks = async (req, res, next) => {
   }
 };
 
-export const exportTrucks = async (req, res, next) => {
+exports.exportTrucks = async (req, res, next) => {
   try {
     const trucks = await truckService.findTrucksByCompany();
     const csv = Papa.unparse(trucks);
@@ -41,7 +36,7 @@ export const exportTrucks = async (req, res, next) => {
   }
 };
 
-export const createTruck = async (req, res, next) => {
+exports.createTruck = async (req, res, next) => {
   try {
     const truckData = req.body;
 
@@ -57,7 +52,7 @@ export const createTruck = async (req, res, next) => {
   }
 };
 
-export const importTrucks = async (req, res, next) => {
+exports.importTrucks = async (req, res, next) => {
   try {
     const { trucks } = req.body;
     if (!trucks || !Array.isArray(trucks)) {
@@ -72,7 +67,7 @@ export const importTrucks = async (req, res, next) => {
   }
 };
 
-export const updateTruck = async (req, res, next) => {
+exports.updateTruck = async (req, res, next) => {
   try {
     const { truckId } = req.params;
     const truckData = req.body;
@@ -93,7 +88,7 @@ export const updateTruck = async (req, res, next) => {
   }
 };
 
-export const deleteTruck = async (req, res, next) => {
+exports.deleteTruck = async (req, res, next) => {
   try {
     const { truckId } = req.params;
     const changes = await truckService.deleteTruck(truckId);

@@ -2,7 +2,7 @@
 const createPreview = (key, header, render) => ({ key, header, render });
 
 // Configuration for the generic DataImporter component
-export const importerConfig = {
+const importerConfig = {
   orders: {
     title: 'Import Orders',
     apiEndpoint: '/api/orders/import',
@@ -184,3 +184,5 @@ export const importerConfig = {
     ],
   },
 };
+
+module.exports = { importerConfig };

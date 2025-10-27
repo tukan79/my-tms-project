@@ -1,7 +1,7 @@
 // Plik: server/routes/surchargeTypeRoutes.js
-import express from 'express';
-import * as surchargeTypeController from '../controllers/surchargeTypeController.js';
-import { authenticateToken, requireRole } from '../middleware/authMiddleware.js';
+const express = require('express');
+const surchargeTypeController = require('../controllers/surchargeTypeController.js');
+const { authenticateToken, requireRole } = require('../middleware/authMiddleware.js');
 
 // Wszystkie operacje na typach dopłat wymagają uprawnień admina
 const router = express.Router();
@@ -12,4 +12,4 @@ router.post('/', surchargeTypeController.create);
 router.put('/:id', surchargeTypeController.update);
 router.delete('/:id', surchargeTypeController.deleteSurcharge);
 
-export default router;
+module.exports = router;
