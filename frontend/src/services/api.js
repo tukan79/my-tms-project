@@ -1,11 +1,8 @@
 import axios from 'axios';
 
-// OSTATECZNA POPRAWKA: Dynamiczne tworzenie adresu URL API.
-// Używamy adresu IP, z którego serwowany jest frontend, ale zmieniamy port na 3000 dla backendu.
-// To rozwiązanie działa zarówno na localhost, jak i w sieci lokalnej bez potrzeby używania .env.
-const apiHost = `${window.location.protocol}//${window.location.hostname}:3000`;
-const baseURL = import.meta.env.VITE_API_BASE_URL || apiHost;
-
+// Używamy zmiennej środowiskowej VITE_API_BASE_URL, która zostanie ustawiona w panelu Vercel dla środowiska produkcyjnego.
+// Jeśli zmienna nie jest dostępna (np. podczas lokalnego rozwoju), używamy domyślnego adresu API.
+const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
 const api = axios.create({
   baseURL,
