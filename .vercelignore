@@ -1,0 +1,8 @@
+server/
+config/
+migrations/
+models/
+*.md
+.gitignore
+.eslintrc.json
+.npmrc
