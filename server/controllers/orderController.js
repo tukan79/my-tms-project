@@ -16,9 +16,8 @@ exports.createOrder = async (req, res, next) => {
   try {
     // Dodajemy ID użytkownika tworzącego zlecenie z tokenu JWT
     // To jest bezpieczniejsze niż poleganie na danych z frontendu.
-    const orderData = { ...req.body, createdByUserId: req.auth.userId };
-    // Serwis `createOrder` oczekuje danych w snake_case i konwertuje je na camelCase.
-    const newOrder = await orderService.createOrder(req.body);
+    const orderData = { ...req.body, created_by_user_id: req.auth.userId };
+    const newOrder = await orderService.createOrder(orderData);
     res.status(201).json(newOrder);
   } catch (error) {
     next(error);
