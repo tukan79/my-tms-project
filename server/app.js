@@ -37,9 +37,12 @@ const app = express();
 // Jest to kluczowe dla bezpieczeństwa, aby serwer akceptował żądania tylko z zaufanych adresów.
 const allowedOrigins = [
   'http://localhost:5173', // Domyślny adres serwera deweloperskiego Vite
+  'http://localhost:3000', // Potencjalny inny port deweloperski
   'http://127.0.0.1:5173',
   // Adres URL aplikacji wdrożonej na Vercel
   'https://my-tms-project-frontend-o22jv2q3m-krzysztofs-projects-36780459.vercel.app',
+  // Adres URL backendu na Railway (na wszelki wypadek, gdyby były jakieś wewnętrzne żądania)
+  'https://my-tms-project-production.up.railway.app',
 ];
 
 // Middleware do parsowania ciasteczek musi być przed CORS, jeśli używasz credentials
@@ -54,18 +57,25 @@ app.use(express.json({ limit: '10mb' }));
 // --- Middleware bezpieczeństwa ---
 app.use(helmet()); // Ustawia bezpieczne nagłówki HTTP
 
-app.use(cors({
+const corsOptions = {
   origin: (origin, callback) => {
     // Pozwalamy na żądania bez 'origin' (np. z Postmana, cURL) oraz z dozwolonych adresów.
     // To ułatwia testowanie API.
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error(`Not allowed by CORS for origin: ${origin}`));
     }
   },
   credentials: true, // Pozwala na przesyłanie danych uwierzytelniających (np. ciasteczek)
-}));
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+};
+
+app.use(cors(corsOptions));
+
+// Jawna obsługa zapytań preflight (OPTIONS)
+app.options('*', cors(corsOptions));
 
 // Ogranicznik żądań, aby chronić przed atakami brute-force
 const limiter = rateLimit({
