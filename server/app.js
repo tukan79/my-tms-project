@@ -38,8 +38,8 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:5173', // Domyślny adres serwera deweloperskiego Vite
   'http://127.0.0.1:5173',
-  // TODO: Zastąp ten adres URL adresem Twojej aplikacji wdrożonej na Vercel
-  'https://your-frontend-url.vercel.app',
+  // Adres URL aplikacji wdrożonej na Vercel
+  'https://my-tms-project-frontend-o22jv2q3m-krzysztofs-projects-36780459.vercel.app',
 ];
 
 // Middleware do parsowania ciasteczek musi być przed CORS, jeśli używasz credentials

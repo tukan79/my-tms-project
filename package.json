@@ -1,35 +1,20 @@
 {
   "name": "my-tms-project",
   "version": "1.0.0",
-  "description": "A simple Transport Management System (TMS) application with a Node.js backend and React frontend.",
+  "description": "A simple Transport Management System (TMS) application - Backend.",
   "private": true,
-  "workspaces": [
-    "server",
-    "frontend"
-  ],
   "scripts": {
-    "dev": "concurrently \"npm run dev -w server\" \"npm run dev -w frontend\"",
-    "server-dev": "npm run dev -w server",
-    "client-dev": "npm run dev -w frontend",
-    "build": "npm run build -w server",
-    "start": "npm start --workspace=server",
-    "clean": "rimraf node_modules server/node_modules frontend/node_modules",
-    "db:init": "node server/db/init.js",
-    "check-updates": "npx npm-check-updates --workspaces --root",
-    "update-packages": "npx npm-check-updates --workspaces --root -u"
+    "start": "cd server && npm start",
+    "dev": "cd server && npm run dev",
+    "build": "cd server && npm install --omit=dev",
+    "db:init": "node server/db/init.js"
   },
   "keywords": [
     "tms",
     "transport",
     "postgresql",
-    "react",
     "nodejs"
   ],
   "author": "Krzysztof Stolarski",
-  "license": "ISC",
-  "devDependencies": {
-    "concurrently": "^9.2.1",
-    "npm-check-updates": "^19.1.1",
-    "rimraf": "^6.0.1"
-  }
+  "license": "ISC"
 }

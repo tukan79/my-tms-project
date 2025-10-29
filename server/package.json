@@ -9,7 +9,7 @@
     "build": "echo \"No build step required for server.\"",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",    
+    "test:coverage": "jest --coverage",
     "db:migrate": "npx sequelize-cli db:migrate",
     "db:migrate:undo": "npx sequelize-cli db:migrate:undo:all",
     "lint": "eslint .",
@@ -48,8 +48,8 @@
     "nodemailer": "^7.0.10",
     "papaparse": "^5.5.3",
     "pdfkit": "^0.17.2",
-    "sequelize": "^6.37.3",
     "pg": "^8.16.3",
+    "sequelize": "^6.37.3",
     "validator": "^13.15.15",
     "winston": "^3.18.3"
   },
