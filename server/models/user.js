@@ -44,11 +44,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: 'user',
     },
-    isDeleted: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-      field: 'is_deleted',
-    },
     refreshToken: {
       type: DataTypes.STRING(512),
       allowNull: true,
