@@ -72,7 +72,10 @@ exports.bulkCreateAssignments = async (req, res, next) => {
       return res.status(400).json({ error: 'All order IDs in the array must be valid numbers.' });
     }
 
-    const result = await assignmentService.bulkCreateAssignments(parsedRunId, parsedOrderIds);
+    const result = await assignmentService.bulkCreateAssignments(
+      parsedRunId, // runId
+      parsedOrderIds // orderIds
+    );
     res.status(201).json({ message: `${result.createdCount} assignments created/updated successfully.`, ...result });
   } catch (error) {
     next(error);
