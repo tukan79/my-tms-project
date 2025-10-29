@@ -19,15 +19,15 @@ exports.createAssignment = async (req, res, next) => {
     }
 
     const parsedOrderId = parseInt(order_id, 10);
-    const parsedRunId = parseInt(run_id, 10); // Usunięto zduplikowaną linię
+    const parsedRunId = parseInt(run_id, 10);
 
     if (isNaN(parsedOrderId) || isNaN(parsedRunId)) {
       return res.status(400).json({ error: 'Order ID and Run ID must be valid numbers.' });
     }
 
-    const newAssignment = await assignmentService.createAssignment({ 
-      order_id: parsedOrderId, 
-      run_id: parsedRunId, 
+    const newAssignment = await assignmentService.createAssignment({
+      orderId: parsedOrderId,
+      runId: parsedRunId,
       notes,
     });
     res.status(201).json(newAssignment);
