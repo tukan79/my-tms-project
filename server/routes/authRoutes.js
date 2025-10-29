@@ -25,6 +25,9 @@ router.post('/login', authLimiter, authController.loginValidation, authControlle
 // Dodajemy trasę do wylogowania
 router.post('/logout', authController.logout);
 
+// Nowa trasa do odświeżania tokenu
+router.post('/refresh', authController.refreshToken);
+
 // Dodajemy brakującą trasę do weryfikacji tokenu
 // Adding the missing route for token verification
 router.get('/verify', authenticateToken, authController.verifyToken);

@@ -30,8 +30,8 @@ const register = async (req, res, next) => {
     const newUser = await userService.createUser({
       email: email,
       password,
-      first_name: firstName,
-      last_name: lastName,
+      firstName: firstName, // Zmieniono na camelCase
+      lastName: lastName,   // Zmieniono na camelCase
       role: 'user',
     });
 
@@ -62,7 +62,7 @@ const login = async (req, res, next) => {
       return res.status(401).json({ error: 'Invalid credentials.' });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password_hash);
+    const isMatch = await bcrypt.compare(password, user.passwordHash); // Zmieniono na camelCase
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid credentials.' });
     }
@@ -72,12 +72,23 @@ const login = async (req, res, next) => {
       return res.status(500).json({ error: 'Server configuration error.' });
     }
 
-    // Tworzenie i zwracanie tokenu JWT.
-    // Creating and returning a JWT token.
-    // Do tokenu JWT wkładamy tylko to, co niezbędne do autoryzacji (ID, rola).
-    // We only put what is necessary for authorization into the JWT token (ID, role).
-    const tokenPayload = { userId: user.id, email: user.email, role: user.role, company_id: user.company_id };
-    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '1d' });
+    // Krok 1: Stwórz accessToken (krótki czas życia)
+    const tokenPayload = { userId: user.id, email: user.email, role: user.role };
+    const accessToken = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '15m' });
+
+    // Krok 2: Stwórz refreshToken (długi czas życia)
+    const refreshToken = jwt.sign(tokenPayload, process.env.JWT_REFRESH_SECRET, { expiresIn: '7d' });
+
+    // Krok 3: Zapisz refreshToken w bazie danych
+    await userService.updateUserRefreshToken(user.id, refreshToken);
+
+    // Krok 4: Wyślij refreshToken w bezpiecznym ciasteczku httpOnly
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // Używaj `secure` tylko na produkcji (HTTPS)
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dni
+    });
 
     // W odpowiedzi do klienta możemy zwrócić więcej danych.
     // We can return more data in the response to the client.
@@ -85,11 +96,11 @@ const login = async (req, res, next) => {
       id: user.id, 
       email: user.email, 
       role: user.role,
-      first_name: user.first_name,
-      last_name: user.last_name
+      firstName: user.firstName, // Zmieniono na camelCase
+      lastName: user.lastName    // Zmieniono na camelCase
     };
-    // Wracamy do wysyłania tokenu w ciele odpowiedzi
-    return res.json({ token, user: userPayload });
+    // Zwróć accessToken i dane użytkownika
+    return res.json({ accessToken, user: userPayload });
   } catch (error) {
     return next(error);
   }
@@ -109,8 +120,8 @@ const verifyToken = async (req, res, next) => {
       id: user.id,
       email: user.email,
       role: user.role,
-      first_name: user.first_name,
-      last_name: user.last_name,
+      firstName: user.firstName, // Zmieniono na camelCase
+      lastName: user.lastName,   // Zmieniono na camelCase
     };
     return res.json({ user: userPayload });
   } catch (error) {
@@ -118,10 +129,52 @@ const verifyToken = async (req, res, next) => {
   }
 };
 
-// Opcjonalnie: wylogowanie
-const logout = (req, res) => {
-  // Wylogowanie po stronie klienta polega na usunięciu tokenu z localStorage
-  return res.json({ message: 'Logged out.' });
+// Nowa funkcja do odświeżania tokenu
+const refreshToken = async (req, res, next) => {
+  const tokenFromCookie = req.cookies.refreshToken;
+  if (!tokenFromCookie) {
+    return res.status(401).json({ error: 'Refresh token not found.' });
+  }
+
+  try {
+    const user = await userService.findUserByRefreshToken(tokenFromCookie);
+    if (!user) {
+      return res.status(403).json({ error: 'Invalid refresh token.' });
+    }
+
+    // Weryfikacja tokenu
+    jwt.verify(tokenFromCookie, process.env.JWT_REFRESH_SECRET, (err, decoded) => {
+      if (err || user.id !== decoded.userId) {
+        return res.status(403).json({ error: 'Invalid refresh token.' });
+      }
+
+      // Jeśli wszystko jest w porządku, wygeneruj nowy accessToken
+      const tokenPayload = { userId: user.id, email: user.email, role: user.role };
+      const accessToken = jwt.sign(tokenPayload, process.env.JWT_SECRET, { expiresIn: '15m' });
+
+      res.json({ accessToken });
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const logout = async (req, res, next) => {
+  try {
+    const tokenFromCookie = req.cookies.refreshToken;
+    if (tokenFromCookie) {
+      const user = await userService.findUserByRefreshToken(tokenFromCookie);
+      if (user) {
+        // Wyczyść refreshToken w bazie danych
+        await userService.updateUserRefreshToken(user.id, null);
+      }
+    }
+    // Wyczyść ciasteczko po stronie klienta
+    res.clearCookie('refreshToken');
+    return res.status(200).json({ message: 'Logged out successfully.' });
+  } catch (error) {
+    next(error);
+  }
 };
 
 module.exports = {
@@ -130,5 +183,6 @@ module.exports = {
   loginValidation,
   login,
   verifyToken,
-  logout
+  logout,
+  refreshToken,
 };

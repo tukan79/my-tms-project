@@ -1,5 +1,7 @@
 // Plik: server/middleware/validationMiddleware.js
 const { body, validationResult } = require('express-validator');
+const { isStrongPassword, passwordStrengthMessage } = require('../utils/validation.js');
+const { User } = require('../models');
 
 // Middleware do obsługi błędów walidacji
 const handleValidationErrors = (req, res, next) => {
@@ -27,6 +29,49 @@ exports.validateRun = [
     .isInt({ min: 1 })
     .withMessage('A valid truck ID is required.'),
   // Dodajemy obsługę błędów na końcu łańcucha walidacji
+  handleValidationErrors,
+];
+
+// Walidacja dla tworzenia użytkownika przez admina
+exports.validateUserCreation = [
+  body('email')
+    .isEmail().withMessage('Please provide a valid email.')
+    .normalizeEmail()
+    .custom(async (value) => {
+      const user = await User.findOne({ where: { email: value } });
+      if (user) {
+        return Promise.reject('E-mail already in use.');
+      }
+    }),
+  body('first_name').notEmpty().withMessage('First name is required.').trim().escape(),
+  body('last_name').notEmpty().withMessage('Last name is required.').trim().escape(),
+  body('password').custom(value => {
+    if (!isStrongPassword(value)) {
+      throw new Error(passwordStrengthMessage);
+    }
+    return true;
+  }),
+  body('role')
+    .isIn(['admin', 'dispatcher', 'user'])
+    .withMessage('Invalid role specified.'),
+  handleValidationErrors,
+];
+
+// Walidacja dla aktualizacji użytkownika przez admina
+exports.validateUserUpdate = [
+  body('email')
+    .optional()
+    .isEmail().withMessage('Please provide a valid email.')
+    .normalizeEmail(),
+  body('first_name').optional().notEmpty().withMessage('First name cannot be empty.').trim().escape(),
+  body('last_name').optional().notEmpty().withMessage('Last name cannot be empty.').trim().escape(),
+  body('password').optional().custom(value => {
+    if (!isStrongPassword(value)) {
+      throw new Error(passwordStrengthMessage);
+    }
+    return true;
+  }),
+  body('role').optional().isIn(['admin', 'dispatcher', 'user']).withMessage('Invalid role specified.'),
   handleValidationErrors,
 ];
 

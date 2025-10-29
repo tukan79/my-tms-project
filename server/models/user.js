@@ -49,6 +49,10 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: false,
       field: 'is_deleted',
     },
+    refreshToken: {
+      type: DataTypes.STRING(512),
+      allowNull: true,
+    },
   }, {
     sequelize,
     modelName: 'User',

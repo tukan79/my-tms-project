@@ -77,6 +77,20 @@ const deleteUser = async (userId) => {
   return User.destroy({ where: { id: userId } });
 };
 
+const updateUserRefreshToken = async (userId, refreshToken) => {
+  return User.update(
+    { refreshToken },
+    { where: { id: userId } }
+  );
+};
+
+const findUserByRefreshToken = async (refreshToken) => {
+  if (!refreshToken) return null;
+  return User.findOne({
+    where: { refreshToken },
+  });
+};
+
 const importUsers = async (usersData) => {
   return sequelize.transaction(async (t) => {
     const errors = [];
@@ -123,5 +137,7 @@ module.exports = {
   findUserById,
   updateUser,
   deleteUser,
-  importUsers
+  importUsers,
+  updateUserRefreshToken,
+  findUserByRefreshToken,
 };
