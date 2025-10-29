@@ -33,6 +33,10 @@ const { sequelize } = require('./models'); // Importujemy instancję Sequelize
 
 const app = express();
 
+// Ustawienie 'trust proxy' jest kluczowe dla aplikacji działających za reverse proxy (np. na Railway, Heroku).
+// Pozwala to poprawnie identyfikować adres IP klienta, co jest niezbędne dla rate-limitingu.
+app.set('trust proxy', 1); // Ufaj pierwszemu proxy
+
 // Definiujemy listę dozwolonych źródeł (origins) dla zapytań CORS.
 // Jest to kluczowe dla bezpieczeństwa, aby serwer akceptował żądania tylko z zaufanych adresów.
 const allowedOrigins = [
