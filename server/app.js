@@ -37,19 +37,6 @@ const app = express();
 // Pozwala to poprawnie identyfikować adres IP klienta, co jest niezbędne dla rate-limitingu.
 app.set('trust proxy', 1); // Ufaj pierwszemu proxy
 
-// Definiujemy listę dozwolonych źródeł (origins) dla zapytań CORS.
-// Jest to kluczowe dla bezpieczeństwa, aby serwer akceptował żądania tylko z zaufanych adresów.
-const allowedOrigins = [
-  'http://localhost:5173', // Domyślny adres serwera deweloperskiego Vite
-  'http://localhost:3000', // Potencjalny inny port deweloperski
-  'http://127.0.0.1:5173',
-  // Adres URL aplikacji wdrożonej na Vercel
-  'https://my-tms-project-frontend-o22jv2q3m-krzysztofs-projects-36780459.vercel.app',
-  'https://my-tms-project-frontend.vercel.app', // Dodajemy główny adres Vercel
-  // Adres URL backendu na Railway (na wszelki wypadek, gdyby były jakieś wewnętrzne żądania)
-  'https://my-tms-project-production.up.railway.app',
-];
-
 // Middleware do parsowania ciasteczek musi być przed CORS, jeśli używasz credentials
 app.use(cookieParser());
 
@@ -63,10 +50,22 @@ app.use(express.json({ limit: '10mb' }));
 app.use(helmet()); // Ustawia bezpieczne nagłówki HTTP
 
 const corsOptions = {
-  origin: (origin, callback) => {
-    // Pozwalamy na żądania bez 'origin' (np. z Postmana, cURL) oraz z dozwolonych adresów.
-    // To ułatwia testowanie API.
-    if (!origin || allowedOrigins.includes(origin)) {
+  origin: function (origin, callback) {
+    // Lista dozwolonych źródeł, w tym wyrażenia regularne dla dynamicznych subdomen.
+    const allowedOriginsPatterns = [
+      /\.vercel\.app$/, // Zezwól na wszystkie subdomeny vercel.app
+      'http://localhost:3000',
+      'http://localhost:5173', // Dodajemy port dla Vite
+      'http://127.0.0.1:5173',
+    ];
+
+    // Zezwól na żądania bez 'origin' (np. z Postmana) lub jeśli origin pasuje do wzorca.
+    if (!origin || allowedOriginsPatterns.some(pattern => {
+      if (pattern instanceof RegExp) {
+        return pattern.test(origin);
+      }
+      return origin === pattern;
+    })) {
       callback(null, true);
     } else {
       callback(new Error(`Not allowed by CORS for origin: ${origin}`));
