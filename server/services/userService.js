@@ -36,6 +36,44 @@ const findUserByEmailWithPassword = async (email) => {
   });
 };
 
+/**
+ * Weryfikuje dane logowania użytkownika i zwraca jego dane w przypadku sukcesu.
+ * Zawiera szczegółowe logowanie do celów diagnostycznych.
+ * @param {string} email - Adres email użytkownika.
+ * @param {string} password - Hasło użytkownika.
+ * @returns {Promise<object|null>} Obiekt użytkownika lub null.
+ */
+const loginUser = async (email, password) => {
+  try {
+    console.log('🔐 LOGIN ATTEMPT - Email:', email);
+    
+    const user = await User.findOne({ where: { email } });
+    console.log('👤 USER FOUND:', user ? 'YES - ' + user.email : 'NO');
+    
+    if (!user) {
+      console.log('❌ LOGIN FAILED - User not found');
+      return null;
+    }
+    
+    console.log('🔑 PASSWORD COMPARISON:');
+    console.log('   Stored hash:', user.passwordHash);
+    
+    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+    console.log('✅ PASSWORD VALID:', isPasswordValid);
+    
+    if (!isPasswordValid) {
+      console.log('❌ LOGIN FAILED - Invalid password');
+    } else {
+      console.log('🎉 LOGIN SUCCESS');
+    }
+    
+    return isPasswordValid ? user : null;
+  } catch (error) {
+    console.error('💥 LOGIN ERROR:', error);
+    throw error; // Rzucamy błąd dalej, aby kontroler mógł go obsłużyć
+  }
+};
+
 const findUserById = async (userId) => {
   return User.findByPk(userId, {
     attributes: { exclude: ['passwordHash'] },
@@ -178,6 +216,7 @@ module.exports = {
   createUser,
   findAllUsers,
   findUserByEmailWithPassword,
+  loginUser,
   findUserById,
   updateUser,
   deleteUser,

@@ -56,20 +56,10 @@ const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    const user = await userService.findUserByEmailWithPassword(email);
+    // Używamy nowej, scentralizowanej funkcji logowania z serwisu
+    const user = await userService.loginUser(email, password);
 
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials.' });
-    }
-
-    // Logowanie diagnostyczne
-    console.log('🔐 LOGIN - Stored hash:', user.passwordHash);
-    console.log('🔐 LOGIN - Provided password:', password);
-    // Poprawka: Porównujemy hasło z `user.passwordHash`, a nie `user.password`.
-    const isMatch = await bcrypt.compare(password, user.passwordHash); 
-    console.log('✅ LOGIN - Password valid:', isMatch);
-
-    if (!isMatch) {
       return res.status(401).json({ error: 'Invalid credentials.' });
     }
 
