@@ -45,6 +45,10 @@ const loginUser = async (email, password) => {
   try {
     console.log('🔐 LOGIN ATTEMPT - Email:', email);
     
+    // DIAGNOSTYKA: Sprawdź czy model User jest poprawny
+    console.log('🔍 USER MODEL TABLE NAME:', User.tableName);
+    console.log('🔍 USER MODEL OPTIONS:', User.options);
+    
     const user = await User.findOne({ where: { email: email.toLowerCase() } });
     console.log('👤 USER FOUND:', user ? 'YES - ' + user.email : 'NO');
     
