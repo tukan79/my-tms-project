@@ -9,7 +9,7 @@ const createUser = async (userData) => {
   console.log('🔐 REGISTER - Hashed password:', passwordHash);
 
   const newUser = await User.create({
-    email,
+    email: email.toLowerCase(), // Zapisujemy email małymi literami
     passwordHash: passwordHash,
     role: role,
     firstName: firstName,
@@ -30,7 +30,7 @@ const findAllUsers = async () => {
 const findUserByEmailWithPassword = async (email) => {
   // Ta funkcja jako jedyna powinna zwracać hash hasła do weryfikacji
   return User.findOne({
-    where: { email },
+    where: { email: email.toLowerCase() }, // Wyszukujemy po emailu z małymi literami
   });
 };
 
@@ -45,7 +45,7 @@ const loginUser = async (email, password) => {
   try {
     console.log('🔐 LOGIN ATTEMPT - Email:', email);
     
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ where: { email: email.toLowerCase() } });
     console.log('👤 USER FOUND:', user ? 'YES - ' + user.email : 'NO');
     
     if (!user) {
@@ -180,7 +180,7 @@ const createDefaultAdminUser = async () => {
   const adminPassword = process.env.ADMIN_PASSWORD || 'Password123!';
   
   try {
-    const existingAdmin = await User.findOne({ where: { email: adminEmail } });
+    const existingAdmin = await User.findOne({ where: { email: adminEmail.toLowerCase() } });
   
     if (existingAdmin) {
       // Jeśli użytkownik już istnieje, po prostu logujemy informację i kończymy.
@@ -191,7 +191,7 @@ const createDefaultAdminUser = async () => {
       // Jeśli użytkownik nie istnieje, tworzymy go.
       console.log(`Creating default admin user: ${adminEmail}`);
       const newUser = await createUser({
-        email: adminEmail,
+        email: adminEmail.toLowerCase(),
         password: adminPassword,
         role: 'admin',
         firstName: 'Admin',
