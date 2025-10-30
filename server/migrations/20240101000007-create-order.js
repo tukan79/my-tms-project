@@ -15,6 +15,7 @@ module.exports = {
       customer_id: {
         type: Sequelize.INTEGER,
         references: { model: 'customers', key: 'id' },
+        index: true, // Dodajemy indeks bezpośrednio tutaj
         onDelete: 'SET NULL',
       },
       order_number: {
@@ -47,6 +48,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true,
         references: { model: 'users', key: 'id' },
+        index: true, // Dodajemy indeks bezpośrednio tutaj
         onDelete: 'SET NULL',
       },
       created_at: {
@@ -65,9 +67,6 @@ module.exports = {
       },
     });
 
-    // Dodajemy indeksy dla często wyszukiwanych kolumn
-    await queryInterface.addIndex('orders', ['customer_id']);
-    await queryInterface.addIndex('orders', ['created_by_user_id']);
   },
 
   async down(queryInterface, Sequelize) {
