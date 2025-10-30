@@ -16,9 +16,7 @@ const createUser = async (userData) => {
     lastName,
   });
 
-  // Zwracamy obiekt bez hasła
-  const { passwordHash: _, ...userWithoutPassword } = newUser.get({ plain: true });
-  return userWithoutPassword;
+  return newUser;
 };
 
 const findAllUsers = async () => {
