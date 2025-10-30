@@ -2,7 +2,7 @@ const { User, sequelize } = require('../models');
 const bcrypt = require('bcrypt');
 
 const createUser = async (userData) => {
-  const { email, password, role, firstName, lastName } = userData;
+  const { email, password, role, first_name: firstName, last_name: lastName } = userData;
   // Logowanie diagnostyczne
   console.log('📝 REGISTER - Plain password:', password);
   const passwordHash = await bcrypt.hash(password, 10);
@@ -10,10 +10,10 @@ const createUser = async (userData) => {
 
   const newUser = await User.create({
     email,
-    passwordHash,
-    role,
-    firstName,
-    lastName,
+    passwordHash: passwordHash,
+    role: role,
+    firstName: firstName,
+    lastName: lastName,
   });
 
   return newUser;
@@ -79,7 +79,7 @@ const findUserById = async (userId) => {
 };
 
 const updateUser = async (userId, userData) => {
-  const { firstName, lastName, role, password } = userData;
+  const { first_name: firstName, last_name: lastName, role, password } = userData;
 
   const fieldsToUpdate = {};
   if (firstName !== undefined) fieldsToUpdate.firstName = firstName;
@@ -87,7 +87,7 @@ const updateUser = async (userId, userData) => {
   if (role !== undefined) fieldsToUpdate.role = role;
 
   // Jeśli hasło jest podane, haszujemy je przed aktualizacją.
-  if (password) {
+  if (password && password.length > 0) {
     fieldsToUpdate.passwordHash = await bcrypt.hash(password, 10);
   }
 

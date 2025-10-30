@@ -4,7 +4,7 @@ const { PostcodeZone, sequelize } = require('../models');
 const createZone = async (zoneData) => {
   const { zone_name: zoneName, postcode_patterns: postcodePatterns, is_home_zone: isHomeZone } = zoneData;
   return PostcodeZone.create({
-    zoneName,
+    zoneName: zoneName,
     postcodePatterns: postcodePatterns || [],
     isHomeZone: isHomeZone || false,
   });
@@ -21,7 +21,7 @@ const updateZone = async (zoneId, zoneData) => {
   
   const [updatedRowsCount, updatedZones] = await PostcodeZone.update(
     {
-      zoneName,
+      zoneName: zoneName,
       postcodePatterns,
       isHomeZone,
     },

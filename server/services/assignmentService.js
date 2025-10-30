@@ -2,7 +2,8 @@
 const { Assignment, Order, sequelize } = require('../models');
 const { Op } = require('sequelize'); // Op jest już importowany z sequelize
 
-const createAssignment = async ({ orderId, runId, notes }) => {
+const createAssignment = async (assignmentData) => {
+  const { orderId, runId, notes } = assignmentData;
   // Używamy transakcji, aby zapewnić, że obie operacje (wstawienie i aktualizacja) powiodą się lub żadna.
   return sequelize.transaction(async (t) => {
     // Krok 1: Stwórz nowe przypisanie używając modelu Sequelize

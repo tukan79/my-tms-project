@@ -34,11 +34,11 @@ exports.createRun = async (req, res, next) => {
   try {
     // Mapujemy snake_case z req.body na camelCase dla serwisu
     const newRun = await runService.createRun({
-      runDate: req.body.run_date,
-      type: req.body.type,
-      truckId: req.body.truck_id,
-      trailerId: req.body.trailer_id,
-      driverId: req.body.driver_id,
+      run_date: req.body.run_date,
+      type: req.body.type, // Already camelCase
+      truck_id: req.body.truck_id,
+      trailer_id: req.body.trailer_id,
+      driver_id: req.body.driver_id,
     });
     res.status(201).json(newRun);
   } catch (error) {
@@ -87,11 +87,11 @@ exports.updateRun = async (req, res, next) => {
     const { id } = req.params; // Zmiana z runId na id
     // Mapujemy snake_case z req.body na camelCase dla serwisu
     const updatedRun = await runService.updateRun(id, {
-      runDate: req.body.run_date,
-      type: req.body.type,
-      truckId: req.body.truck_id,
-      trailerId: req.body.trailer_id,
-      driverId: req.body.driver_id,
+      run_date: req.body.run_date,
+      type: req.body.type, // Already camelCase
+      truck_id: req.body.truck_id,
+      trailer_id: req.body.trailer_id,
+      driver_id: req.body.driver_id,
     });
     if (!updatedRun) {
       return res.status(404).json({ error: 'Run not found or already deleted.' });

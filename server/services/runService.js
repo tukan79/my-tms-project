@@ -7,11 +7,11 @@ const createRun = async (runData) => {
   const { run_date: runDate, type, truck_id: truckId, trailer_id: trailerId, driver_id: driverId } = runData;
 
   const newRun = await Run.create({
-    runDate,
-    type,
-    truckId,
+    runDate: runDate,
+    type: type,
+    truckId: truckId,
     trailerId: trailerId || null, // Zapewniamy, że pusty string staje się null
-    driverId,
+    driverId: driverId,
   });
 
   return newRun;
@@ -88,11 +88,11 @@ const updateRun = async (runId, runData) => {
   const { run_date: runDate, type, truck_id: truckId, trailer_id: trailerId, driver_id: driverId } = runData;
 
   const dataToUpdate = {
-    runDate,
-    type,
-    truckId,
+    runDate: runDate,
+    type: type,
+    truckId: truckId,
     trailerId: trailerId || null,
-    driverId,
+    driverId: driverId,
   };
 
   const [updatedRowsCount, updatedRuns] = await Run.update(

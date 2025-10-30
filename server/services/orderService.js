@@ -10,15 +10,15 @@ const createOrder = async (orderData) => {
       order_number: orderNumber,
       service_level: serviceLevel,
       customer_reference: customerReference,
-      status,
+      status, // Already camelCase
       sender_details: senderDetails,
       recipient_details: recipientDetails,
       cargo_details: cargoDetails,
       loading_date_time: loadingDateTime,
       unloading_date_time: unloadingDateTime,
       selected_surcharges: selectedSurcharges,
-      unloading_start_time: unloadingStartTime,
-      unloading_end_time: unloadingEndTime,
+      unloading_start_time: unloadingStartTime, // Already camelCase
+      unloading_end_time: unloadingEndTime, // Already camelCase
     } = orderData;
 
     // Krok 1: Utwórz zlecenie
@@ -26,7 +26,7 @@ const createOrder = async (orderData) => {
       customerId,
       orderNumber,
       serviceLevel,
-      customerReference,
+      customerReference, // Already camelCase
       status,
       senderDetails, // Sequelize automatycznie obsłuży JSONB
       recipientDetails, // Sequelize automatycznie obsłuży JSONB
@@ -89,11 +89,11 @@ const updateOrder = async (orderId, orderData) => {
     // Krok 2: Zmapuj przychodzące dane snake_case na camelCase
     const {
       customer_id: customerId, order_number: orderNumber, service_level: serviceLevel,
-      customer_reference: customerReference, status, sender_details: senderDetails,
-      recipient_details: recipientDetails, cargo_details: cargoDetails,
+      customer_reference: customerReference, status, sender_details: senderDetails, // Already camelCase
+      recipient_details: recipientDetails, cargo_details: cargoDetails, // Already camelCase
       loading_date_time: loadingDateTime, unloading_date_time: unloadingDateTime,
-      selected_surcharges: selectedSurcharges, unloading_start_time: unloadingStartTime,
-      unloading_end_time: unloadingEndTime, final_price: finalPrice
+      selected_surcharges: selectedSurcharges, unloading_start_time: unloadingStartTime, // Already camelCase
+      unloading_end_time: unloadingEndTime, final_price: finalPrice // Already camelCase
     } = orderData;
 
     // Krok 2a: Połącz istniejące dane z nowymi danymi z formularza.

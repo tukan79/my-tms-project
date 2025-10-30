@@ -26,8 +26,8 @@ exports.createAssignment = async (req, res, next) => {
     }
 
     const newAssignment = await assignmentService.createAssignment({
-      orderId: parsedOrderId,
-      runId: parsedRunId,
+      orderId: parsedOrderId, // Already camelCase
+      runId: parsedRunId,     // Already camelCase
       notes,
     });
     res.status(201).json(newAssignment);
@@ -73,8 +73,8 @@ exports.bulkCreateAssignments = async (req, res, next) => {
     }
 
     const result = await assignmentService.bulkCreateAssignments(
-      parsedRunId, // runId
-      parsedOrderIds // orderIds
+      parsedRunId,
+      parsedOrderIds
     );
     res.status(201).json({ message: `${result.createdCount} assignments created/updated successfully.`, ...result });
   } catch (error) {

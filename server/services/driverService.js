@@ -9,7 +9,7 @@ const { Op } = require('sequelize');
  * @returns {Promise<object>} Nowo utworzony obiekt kierowcy.
  */
 const createDriver = async (driverData) => {
-  let { first_name: firstName, last_name: lastName, phone_number: phoneNumber = '', cpc_number: cpcNumber = '', login_code: loginCode = '', license_number: licenseNumber = '', is_active: isActive = true } = driverData;
+  let { first_name: firstName, last_name: lastName, phone_number: phoneNumber, cpc_number: cpcNumber, login_code: loginCode, license_number: licenseNumber, is_active: isActive } = driverData;
 
   // Automatyczne generowanie login_code, jeśli nie został podany.
   // Automatically generate login_code if not provided.
@@ -23,13 +23,13 @@ const createDriver = async (driverData) => {
 
   try {
     const newDriver = await Driver.create({
-      firstName,
-      lastName,
-      phoneNumber,
-      cpcNumber,
-      loginCode,
-      licenseNumber,
-      isActive,
+      firstName: firstName,
+      lastName: lastName,
+      phoneNumber: phoneNumber || '',
+      cpcNumber: cpcNumber || '',
+      loginCode: loginCode,
+      licenseNumber: licenseNumber || '',
+      isActive: isActive === undefined ? true : isActive,
     });
     return newDriver;
   } catch (error) {
@@ -66,15 +66,15 @@ const findDriverById = async (driverId) => {
  * @returns {Promise<object|null>} Zaktualizowany obiekt kierowcy lub null.
  */
 const updateDriver = async (driverId, driverData) => {
-  const { first_name: firstName, last_name: lastName, phone_number: phoneNumber = '', cpc_number: cpcNumber = '', login_code: loginCode = '', license_number: licenseNumber = '', is_active: isActive } = driverData;
+  const { first_name: firstName, last_name: lastName, phone_number: phoneNumber, cpc_number: cpcNumber, login_code: loginCode, license_number: licenseNumber, is_active: isActive } = driverData;
 
   const dataToUpdate = {
     firstName,
     lastName,
-    phoneNumber,
-    cpcNumber,
-    loginCode,
-    licenseNumber,
+    phoneNumber: phoneNumber || '',
+    cpcNumber: cpcNumber || '',
+    loginCode: loginCode || '',
+    licenseNumber: licenseNumber || '',
     isActive,
   };
 

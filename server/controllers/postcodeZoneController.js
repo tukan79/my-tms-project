@@ -20,9 +20,9 @@ exports.createZone = async (req, res, next) => {
     }
     // Mapujemy snake_case z req.body na camelCase dla serwisu
     const newZone = await zoneService.createZone({
-      zoneName: req.body.zone_name,
-      postcodePatterns: req.body.postcode_patterns,
-      isHomeZone: req.body.is_home_zone,
+      zone_name: req.body.zone_name,
+      postcode_patterns: req.body.postcode_patterns,
+      is_home_zone: req.body.is_home_zone,
     });
     res.status(201).json(newZone);
   } catch (error) {
@@ -34,9 +34,9 @@ exports.updateZone = async (req, res, next) => {
   try {
     // Mapujemy snake_case z req.body na camelCase dla serwisu
     const updatedZone = await zoneService.updateZone(req.params.zoneId, {
-      zoneName: req.body.zone_name,
-      postcodePatterns: req.body.postcode_patterns,
-      isHomeZone: req.body.is_home_zone,
+      zone_name: req.body.zone_name,
+      postcode_patterns: req.body.postcode_patterns,
+      is_home_zone: req.body.is_home_zone,
     });
     if (!updatedZone) {
       return res.status(404).json({ error: 'Zone not found.' });

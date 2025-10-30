@@ -44,7 +44,7 @@ exports.createTrailer = async (req, res, next) => {
     }
     
     // Mapujemy snake_case z req.body na camelCase dla serwisu
-    const newTrailer = await trailerService.createTrailer(trailerData);
+    const newTrailer = await trailerService.createTrailer(req.body);
     res.status(201).json(newTrailer);
   } catch (error) {
     next(error);

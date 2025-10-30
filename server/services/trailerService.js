@@ -2,10 +2,11 @@ const { Trailer, sequelize } = require('../models');
 
 const createTrailer = async (trailerData) => {
   try {
+    const { registration_plate, ...restOfData } = trailerData;
     // Sequelize automatycznie mapuje snake_case na camelCase dzięki opcji `underscored: true` w modelu.
     const newTrailer = await Trailer.create({
-      ...trailerData,
-      isActive: trailerData.status === 'active',
+      registrationPlate: registration_plate,
+      ...restOfData,
     });
     return newTrailer;
   } catch (error) {
@@ -22,10 +23,11 @@ const findTrailersByCompany = async () => {
 };
 
 const updateTrailer = async (trailerId, trailerData) => {
+  const { registration_plate, ...restOfData } = trailerData;
   const [updatedRowsCount, updatedTrailers] = await Trailer.update(
     {
-      ...trailerData,
-      isActive: trailerData.status === 'active',
+      registrationPlate: registration_plate,
+      ...restOfData,
     },
     {
       where: { id: trailerId },

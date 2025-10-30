@@ -43,23 +43,25 @@ exports.createCustomer = async (req, res, next) => {
     }
     // Mapujemy snake_case z req.body na camelCase dla serwisu
     const newCustomer = await customerService.createCustomer({
-      name: req.body.name,
-      customerCode: req.body.customer_code,
-      addressLine1: req.body.address_line1,
-      addressLine2: req.body.address_line2,
-      addressLine3: req.body.address_line3,
-      addressLine4: req.body.address_line4,
-      postcode: req.body.postcode,
-      phoneNumber: req.body.phone_number,
-      countryCode: req.body.country_code,
-      category: req.body.category,
-      currency: req.body.currency,
-      vatNumber: req.body.vat_number,
-      paymentTerms: req.body.payment_terms,
-      status: req.body.status,
-      podOnPortal: req.body.pod_on_portal,
-      invoiceOnPortal: req.body.invoice_on_portal,
-      handheldStatusOnPortal: req.body.handheld_status_on_portal,
+      name: req.body.name, // Direct mapping
+      customer_code: req.body.customer_code,
+      address_line1: req.body.address_line1,
+      address_line2: req.body.address_line2,
+      address_line3: req.body.address_line3,
+      address_line4: req.body.address_line4,
+      postcode: req.body.postcode, // Direct mapping
+      phone_number: req.body.phone_number,
+      country_code: req.body.country_code,
+      category: req.body.category, // Direct mapping
+      currency: req.body.currency, // Direct mapping
+      vat_number: req.body.vat_number,
+      payment_terms: req.body.payment_terms,
+      status: req.body.status, // Direct mapping
+      pod_on_portal: req.body.pod_on_portal,
+      invoice_on_portal: req.body.invoice_on_portal,
+      handheld_status_on_portal: req.body.handheld_status_on_portal,
+      eta_status_on_portal: req.body.eta_status_on_portal,
+      general_status_on_portal: req.body.general_status_on_portal,
     });
     res.status(201).json(newCustomer);
   } catch (error) {
@@ -71,23 +73,25 @@ exports.updateCustomer = async (req, res, next) => {
   try {
     // Mapujemy snake_case z req.body na camelCase dla serwisu
     const updatedCustomer = await customerService.updateCustomer(req.params.customerId, {
-      name: req.body.name,
-      customerCode: req.body.customer_code,
-      addressLine1: req.body.address_line1,
-      addressLine2: req.body.address_line2,
-      addressLine3: req.body.address_line3,
-      addressLine4: req.body.address_line4,
-      postcode: req.body.postcode,
-      phoneNumber: req.body.phone_number,
-      countryCode: req.body.country_code,
-      category: req.body.category,
-      currency: req.body.currency,
-      vatNumber: req.body.vat_number,
-      paymentTerms: req.body.payment_terms,
-      status: req.body.status,
-      podOnPortal: req.body.pod_on_portal,
-      invoiceOnPortal: req.body.invoice_on_portal,
-      handheldStatusOnPortal: req.body.handheld_status_on_portal,
+      name: req.body.name, // Direct mapping
+      customer_code: req.body.customer_code,
+      address_line1: req.body.address_line1,
+      address_line2: req.body.address_line2,
+      address_line3: req.body.address_line3,
+      address_line4: req.body.address_line4,
+      postcode: req.body.postcode, // Direct mapping
+      phone_number: req.body.phone_number,
+      country_code: req.body.country_code,
+      category: req.body.category, // Direct mapping
+      currency: req.body.currency, // Direct mapping
+      vat_number: req.body.vat_number,
+      payment_terms: req.body.payment_terms,
+      status: req.body.status, // Direct mapping
+      pod_on_portal: req.body.pod_on_portal,
+      invoice_on_portal: req.body.invoice_on_portal,
+      handheld_status_on_portal: req.body.handheld_status_on_portal,
+      eta_status_on_portal: req.body.eta_status_on_portal,
+      general_status_on_portal: req.body.general_status_on_portal,
     });
     if (!updatedCustomer) {
       return res.status(404).json({ error: 'Customer not found.' });

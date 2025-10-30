@@ -10,15 +10,15 @@ const findAll = async () => {
 const create = async (surchargeData) => {
   const { code, name, description, calculation_method: calculationMethod, amount, is_automatic: isAutomatic, requires_time: requiresTime, start_time: startTime, end_time: endTime } = surchargeData;
   return SurchargeType.create({
-    code,
-    name,
-    description,
-    calculationMethod,
-    amount,
+    code: code,
+    name: name,
+    description: description,
+    calculationMethod: calculationMethod,
+    amount: amount,
     isAutomatic: isAutomatic || false,
     requiresTime: requiresTime || false,
-    startTime: startTime || null,
-    endTime: endTime || null,
+    startTime: startTime,
+    endTime: endTime,
   });
 };
 
@@ -27,7 +27,7 @@ const update = async (id, surchargeData) => {
   
   const [updatedRowsCount, updatedSurcharges] = await SurchargeType.update(
     {
-      code, name, description, calculationMethod, amount, isAutomatic, requiresTime, startTime, endTime
+      code, name, description, calculationMethod, amount, isAutomatic, requiresTime, startTime, endTime // Already camelCase
     },
     {
       where: { id },

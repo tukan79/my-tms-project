@@ -9,16 +9,16 @@ const createTruck = async (truckData) => {
 
   try {
     const newTruck = await Truck.create({
-      registrationPlate,
-      brand,
-      model,
-      vin,
-      productionYear,
-      typeOfTruck,
-      totalWeight,
-      palletCapacity,
-      maxPayloadKg,
-      isActive,
+      registrationPlate: registrationPlate,
+      brand: brand,
+      model: model,
+      vin: vin,
+      productionYear: productionYear,
+      typeOfTruck: typeOfTruck,
+      totalWeight: totalWeight,
+      palletCapacity: palletCapacity,
+      maxPayloadKg: maxPayloadKg,
+      isActive: isActive,
     });
     return newTruck;
   } catch (error) {
@@ -40,16 +40,16 @@ const updateTruck = async (truckId, truckData) => {
   } = truckData;
 
   const dataToUpdate = {
-    registrationPlate,
-    brand,
-    model,
-    vin,
-    productionYear,
-    typeOfTruck,
-    totalWeight,
-    palletCapacity,
-    maxPayloadKg,
-    isActive,
+    registrationPlate: registrationPlate,
+    brand: brand,
+    model: model,
+    vin: vin,
+    productionYear: productionYear,
+    typeOfTruck: typeOfTruck,
+    totalWeight: totalWeight,
+    palletCapacity: palletCapacity,
+    maxPayloadKg: maxPayloadKg,
+    isActive: isActive,
   };
 
   const [updatedRowsCount, updatedTrucks] = await Truck.update(

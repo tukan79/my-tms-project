@@ -14,12 +14,13 @@ const getAllUsers = async (req, res, next) => {
 const createUser = async (req, res, next) => {
   try {
     // Mapujemy snake_case z req.body na camelCase dla serwisu
-    const newUser = await userService.createUser({
+    const newUser = await userService.createUser(req.body);
+    /*
       email: req.body.email,
       password: req.body.password,
       firstName: req.body.first_name,
       lastName: req.body.last_name,
-    });
+    */
     res.status(201).json(newUser);
   } catch (error) {
     next(error);
@@ -30,12 +31,7 @@ const updateUser = async (req, res, next) => {
   try {
     const { userId } = req.params;
     // Mapujemy snake_case z req.body na camelCase dla serwisu
-    const updatedUser = await userService.updateUser(userId, {
-      firstName: req.body.first_name,
-      lastName: req.body.last_name,
-      role: req.body.role,
-      password: req.body.password,
-    });
+    const updatedUser = await userService.updateUser(userId, req.body);
     if (!updatedUser) {
       return res.status(404).json({ error: 'User not found.' });
     }

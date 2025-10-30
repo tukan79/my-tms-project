@@ -54,13 +54,13 @@ exports.createDriver = async (req, res, next) => {
     }
     // Mapujemy snake_case z req.body na camelCase dla serwisu
     const newDriver = await driverService.createDriver({
-      firstName: req.body.first_name,
-      lastName: req.body.last_name,
-      phoneNumber: req.body.phone_number,
-      cpcNumber: req.body.cpc_number,
-      loginCode: req.body.login_code,
-      licenseNumber: req.body.license_number,
-      isActive: req.body.is_active,
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      phone_number: req.body.phone_number,
+      cpc_number: req.body.cpc_number,
+      login_code: req.body.login_code,
+      license_number: req.body.license_number,
+      is_active: req.body.is_active,
     });
     res.status(201).json(newDriver);
   } catch (error) {
@@ -79,13 +79,13 @@ exports.updateDriver = async (req, res, next) => {
 
     // Mapujemy snake_case z req.body na camelCase dla serwisu
     const updatedDriver = await driverService.updateDriver(driverId, {
-      firstName: req.body.first_name,
-      lastName: req.body.last_name,
-      phoneNumber: req.body.phone_number,
-      cpcNumber: req.body.cpc_number,
-      loginCode: req.body.login_code,
-      licenseNumber: req.body.license_number,
-      isActive: req.body.is_active,
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      phone_number: req.body.phone_number,
+      cpc_number: req.body.cpc_number,
+      login_code: req.body.login_code,
+      license_number: req.body.license_number,
+      is_active: req.body.is_active,
     });
 
     if (!updatedDriver) {

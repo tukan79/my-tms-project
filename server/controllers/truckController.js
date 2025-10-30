@@ -43,18 +43,7 @@ exports.createTruck = async (req, res, next) => {
     }
     
     // Mapujemy snake_case z req.body na camelCase dla serwisu
-    const newTruck = await truckService.createTruck({
-      registrationPlate: truckData.registration_plate,
-      brand: truckData.brand,
-      model: truckData.model,
-      vin: truckData.vin,
-      productionYear: truckData.production_year,
-      typeOfTruck: truckData.type_of_truck,
-      totalWeight: truckData.total_weight,
-      palletCapacity: truckData.pallet_capacity,
-      maxPayloadKg: truckData.max_payload_kg,
-      isActive: truckData.is_active,
-    });
+    const newTruck = await truckService.createTruck(req.body);
     res.status(201).json(newTruck);
   } catch (error) {
     next(error);
@@ -84,18 +73,7 @@ exports.updateTruck = async (req, res, next) => {
     }
     
     // Mapujemy snake_case z req.body na camelCase dla serwisu
-    const updatedTruck = await truckService.updateTruck(truckId, {
-      registrationPlate: req.body.registration_plate,
-      brand: req.body.brand,
-      model: req.body.model,
-      vin: req.body.vin,
-      productionYear: req.body.production_year,
-      typeOfTruck: req.body.type_of_truck,
-      totalWeight: req.body.total_weight,
-      palletCapacity: req.body.pallet_capacity,
-      maxPayloadKg: req.body.max_payload_kg,
-      isActive: req.body.is_active,
-    });
+    const updatedTruck = await truckService.updateTruck(truckId, req.body);
 
     if (!updatedTruck) {
       return res.status(404).json({ error: 'Nie znaleziono pojazdu lub nie masz uprawnień do jego edycji.' });

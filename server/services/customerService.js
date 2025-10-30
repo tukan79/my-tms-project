@@ -2,15 +2,15 @@
 const { Customer, sequelize } = require('../models');
 
 const createCustomer = async (customerData) => {
-  const { 
+  const {
     name, customer_code: customerCode, address_line1: addressLine1, address_line2: addressLine2, address_line3: addressLine3, address_line4: addressLine4, 
     postcode, phone_number: phoneNumber, country_code: countryCode, category, currency, vat_number: vatNumber, payment_terms: paymentTerms, status,
     pod_on_portal: podOnPortal, invoice_on_portal: invoiceOnPortal, handheld_status_on_portal: handheldStatusOnPortal, eta_status_on_portal: etaStatusOnPortal, general_status_on_portal: generalStatusOnPortal
   } = customerData;
 
   return Customer.create({
-    name, customerCode, addressLine1, addressLine2, addressLine3, addressLine4, postcode, phoneNumber, 
-    countryCode, category, currency, vatNumber, paymentTerms, status, podOnPortal, invoiceOnPortal, 
+    name, customerCode, addressLine1, addressLine2, addressLine3, addressLine4, postcode, phoneNumber,
+    countryCode, category, currency, vatNumber, paymentTerms, status, podOnPortal, invoiceOnPortal,
     handheldStatusOnPortal, etaStatusOnPortal, generalStatusOnPortal
   });
 };
@@ -23,15 +23,15 @@ const findAllCustomers = async () => {
 };
 
 const updateCustomer = async (customerId, customerData) => {
-  const { 
+  const {
     name, customer_code: customerCode, address_line1: addressLine1, address_line2: addressLine2, address_line3: addressLine3, address_line4: addressLine4, 
     postcode, phone_number: phoneNumber, country_code: countryCode, category, currency, vat_number: vatNumber, payment_terms: paymentTerms, status,
     pod_on_portal: podOnPortal, invoice_on_portal: invoiceOnPortal, handheld_status_on_portal: handheldStatusOnPortal, eta_status_on_portal: etaStatusOnPortal, general_status_on_portal: generalStatusOnPortal
   } = customerData;
 
   const dataToUpdate = {
-    name, customerCode, addressLine1, addressLine2, addressLine3, addressLine4, postcode, phoneNumber, 
-    countryCode, category, currency, vatNumber, paymentTerms, status, podOnPortal, invoiceOnPortal, 
+    name, customerCode, addressLine1, addressLine2, addressLine3, addressLine4, postcode, phoneNumber,
+    countryCode, category, currency, vatNumber, paymentTerms, status, podOnPortal, invoiceOnPortal,
     handheldStatusOnPortal, etaStatusOnPortal, generalStatusOnPortal
   };
 
