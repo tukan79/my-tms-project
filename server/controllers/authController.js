@@ -125,17 +125,16 @@ const refreshToken = async (req, res, next) => {
       return res.status(403).json({ error: 'Invalid refresh token.' });
     }
 
-    // Weryfikacja tokenu
-    jwt.verify(tokenFromCookie, process.env.JWT_REFRESH_SECRET, (err, decoded) => {
-      if (err || user.id !== decoded.userId) {
-        return res.status(403).json({ error: 'Invalid refresh token.' });
-      }
+    // Weryfikacja tokenu za pomocą async/await dla większej czytelności
+    const decoded = jwt.verify(tokenFromCookie, process.env.JWT_REFRESH_SECRET);
 
-      // Jeśli wszystko jest w porządku, wygeneruj nowy accessToken
-      const accessToken = authService.refreshAccessToken(user);
+    if (user.id !== decoded.userId) {
+      return res.status(403).json({ error: 'Invalid refresh token payload.' });
+    }
 
-      res.json({ accessToken });
-    });
+    // Jeśli wszystko jest w porządku, wygeneruj nowy accessToken
+    const accessToken = authService.refreshAccessToken(user);
+    res.json({ accessToken });
   } catch (error) {
     next(error);
   }
