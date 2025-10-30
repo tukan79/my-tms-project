@@ -1,9 +1,12 @@
 const { User, sequelize } = require('../models');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 
 const createUser = async (userData) => {
   const { email, password, role, firstName, lastName } = userData;
+  // Logowanie diagnostyczne
+  console.log('📝 REGISTER - Plain password:', password);
   const passwordHash = await bcrypt.hash(password, 10);
+  console.log('🔐 REGISTER - Hashed password:', passwordHash);
 
   const newUser = await User.create({
     email,

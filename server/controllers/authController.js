@@ -1,6 +1,6 @@
 // Plik server/controllers/authController.js
 const validator = require('validator');
-const bcrypt = require('bcryptjs');
+const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const userService = require('../services/userService.js');
@@ -62,8 +62,13 @@ const login = async (req, res, next) => {
       return res.status(401).json({ error: 'Invalid credentials.' });
     }
 
+    // Logowanie diagnostyczne
+    console.log('🔐 LOGIN - Stored hash:', user.passwordHash);
+    console.log('🔐 LOGIN - Provided password:', password);
     // Poprawka: Porównujemy hasło z `user.passwordHash`, a nie `user.password`.
     const isMatch = await bcrypt.compare(password, user.passwordHash); 
+    console.log('✅ LOGIN - Password valid:', isMatch);
+
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid credentials.' });
     }
