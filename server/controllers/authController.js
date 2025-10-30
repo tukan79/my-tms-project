@@ -38,7 +38,7 @@ const register = async (req, res, next) => {
 
     // Nie zwracamy całego obiektu, tylko potwierdzenie.
     // We don't return the whole object, just a confirmation.
-    return res.status(201).json({ message: 'User registered successfully.', user: { id: newUser.id, email: newUser.email, role: newUser.role } });
+    return res.status(201).json({ message: 'User registered successfully.' });
   } catch (error) {
     return next(error);
   }
