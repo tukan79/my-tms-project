@@ -44,35 +44,30 @@ const findUserByEmailWithPassword = async (email) => {
 const loginUser = async (email, password) => {
   try {
     console.log('🔐 LOGIN ATTEMPT - Email:', email);
-    
-    // DIAGNOSTYKA: Sprawdź czy model User jest poprawny
-    console.log('🔍 USER MODEL TABLE NAME:', User.tableName);
-    console.log('🔍 USER MODEL OPTIONS:', User.options);
-    
-    const user = await User.findOne({ where: { email: email.toLowerCase() } });
+
+    const user = await User.findOne({
+      where: { email: email.toLowerCase() },
+      paranoid: false, // <- KLUCZOWE: WYŁĄCZ SOFT DELETE
+    });
+
     console.log('👤 USER FOUND:', user ? 'YES - ' + user.email : 'NO');
-    
+
     if (!user) {
       console.log('❌ LOGIN FAILED - User not found');
       return null;
     }
-    
+
     console.log('🔑 PASSWORD COMPARISON:');
     console.log('   Stored hash:', user.passwordHash);
-    
+    console.log('   Provided password:', password);
+
     const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
     console.log('✅ PASSWORD VALID:', isPasswordValid);
-    
-    if (!isPasswordValid) {
-      console.log('❌ LOGIN FAILED - Invalid password');
-    } else {
-      console.log('🎉 LOGIN SUCCESS');
-    }
-    
+
     return isPasswordValid ? user : null;
   } catch (error) {
     console.error('💥 LOGIN ERROR:', error);
-    throw error; // Rzucamy błąd dalej, aby kontroler mógł go obsłużyć
+    return null;
   }
 };
 
