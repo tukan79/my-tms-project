@@ -38,7 +38,12 @@ const register = async (req, res, next) => {
 
     // Nie zwracamy całego obiektu, tylko potwierdzenie.
     // We don't return the whole object, just a confirmation.
-    return res.status(201).json({ message: 'User registered successfully.' });
+    // Zwracamy minimalny payload, aby frontend mógł np. wyświetlić powitanie.
+    const userPayload = {
+      email: newUser.email,
+      role: newUser.role,
+    };
+    return res.status(201).json({ message: 'User registered successfully.', user: userPayload });
   } catch (error) {
     return next(error);
   }
@@ -76,7 +81,7 @@ const login = async (req, res, next) => {
     // W odpowiedzi do klienta możemy zwrócić więcej danych.
     // We can return more data in the response to the client.
     const userPayload = { 
-      id: user.id, 
+      // Celowo nie zwracamy ID, ponieważ jest ono w tokenie i nie powinno być potrzebne na frontendzie.
       email: user.email, 
       role: user.role,
       firstName: user.firstName,
