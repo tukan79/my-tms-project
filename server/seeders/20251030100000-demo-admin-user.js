@@ -14,6 +14,7 @@ module.exports = {
       email: process.env.ADMIN_EMAIL || 'admin@example.com',
       password_hash: passwordHash,
       role: 'admin',
+      refresh_token: null, // Dodajemy pole refreshToken, aby było zgodne z modelem
       created_at: new Date(),
       updated_at: new Date()
     }], {});

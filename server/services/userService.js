@@ -138,7 +138,7 @@ const importUsers = async (usersData) => {
  */
 const createDefaultAdminUser = async () => {
   const adminEmail = process.env.ADMIN_EMAIL || 'admin@tms.com';
-  const adminPassword = process.env.ADMIN_PASSWORD || 'password123';
+  const adminPassword = process.env.ADMIN_PASSWORD || 'Password123!';
 
   try {
     const existingAdmin = await User.findOne({ where: { email: adminEmail } });
