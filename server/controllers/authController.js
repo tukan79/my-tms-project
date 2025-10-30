@@ -85,7 +85,7 @@ const login = async (req, res, next) => {
     // Zwróć accessToken i dane użytkownika
     return res.json({ accessToken, user: userPayload });
   } catch (error) {
-    return next(error);
+    next(error);
   }
 };
 
@@ -108,7 +108,7 @@ const verifyToken = async (req, res, next) => {
     };
     return res.json({ user: userPayload });
   } catch (error) {
-    return next(error);
+    next(error);
   }
 };
 
