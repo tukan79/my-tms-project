@@ -6,6 +6,16 @@ if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
 
+// DIAGNOSTYKA: Sprawdź zmienne środowiskowe
+console.log('🔑 Checking environment variables:');
+console.log('   JWT_SECRET exists:', !!process.env.JWT_SECRET);
+console.log('   JWT_SECRET value:', process.env.JWT_SECRET ? '***SET***' : 'NOT SET');
+console.log('   All env vars:', Object.keys(process.env).filter(key => key.includes('JWT')));
+
+if (!process.env.JWT_SECRET) {
+  console.error('❌ CRITICAL: JWT_SECRET is not available to the application!');
+}
+
 const app = require('./app.js');
 const { sequelize } = require('./models'); // Importujemy instancję Sequelize
 const userService = require('./services/userService.js'); // Importujemy serwis użytkownika
