@@ -25,7 +25,7 @@ const createBugReport = async (description, context, userId) => {
     context,
     userId,
   });
-});
+};
 
 const sendBugReportEmail = async (description, context) => {
   const { reportingUser, url, userAgent } = context;
