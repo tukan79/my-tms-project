@@ -8,7 +8,7 @@ const path = require('path');
 exports.getAllDrivers = async (req, res, next) => {
   try {
     const drivers = await driverService.findDriversByCompany(); 
-    res.status(200).json(drivers);
+    res.status(200).json({ drivers: drivers || [] });
   } catch (error) {
     next(error);
   }

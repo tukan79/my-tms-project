@@ -4,7 +4,7 @@ const assignmentService = require('../services/assignmentService.js');
 exports.getAllAssignments = async (req, res, next) => {
   try {
     const assignments = await assignmentService.findAllAssignments(); // Changed from findAssignments
-    res.json(assignments);
+    res.json({ assignments: assignments || [] });
   } catch (error) {
     next(error);
   }

@@ -7,7 +7,7 @@ const path = require('path');
 exports.getAllTrailers = async (req, res, next) => {
   try {
     const trailers = await trailerService.findTrailersByCompany();
-    res.json(trailers);
+    res.json({ trailers: trailers || [] });
   } catch (error) {
     next(error);
   }

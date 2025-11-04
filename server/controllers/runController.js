@@ -7,7 +7,7 @@ exports.getAllRuns = async (req, res, next) => {
     // Przekazujemy filtry z zapytania (np. ?date=YYYY-MM-DD) do serwisu
     const filters = req.query;
     const runs = await runService.findAllRuns(filters);
-    res.json(runs);
+    res.json({ runs: runs || [] });
   } catch (error) {
     next(error);
   }

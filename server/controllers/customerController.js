@@ -7,7 +7,7 @@ const path = require('path');
 exports.getAllCustomers = async (req, res, next) => {
   try {
     const customers = await customerService.findAllCustomers();
-    res.json(customers);
+    res.json({ customers: customers || [] });
   } catch (error) {
     next(error);
   }

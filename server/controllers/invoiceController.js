@@ -20,7 +20,7 @@ exports.createInvoice = async (req, res, next) => {
 exports.getAllInvoices = async (req, res, next) => {
   try {
     const invoices = await invoiceService.findAllInvoices();
-    res.json(invoices);
+    res.json({ invoices: invoices || [] });
   } catch (error) {
     next(error);
   }

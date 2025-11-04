@@ -7,7 +7,7 @@ const path = require('path');
 exports.getAllZones = async (req, res, next) => {
   try {
     const zones = await zoneService.findAllZones();
-    res.json(zones);
+    res.json({ zones: zones || [] });
   } catch (error) {
     next(error);
   }

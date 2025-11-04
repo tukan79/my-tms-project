@@ -7,7 +7,7 @@ const path = require('path');
 exports.getAllTrucks = async (req, res, next) => {
   try {
     const trucks = await truckService.findTrucksByCompany();
-    res.json(trucks);
+    res.json({ trucks: trucks || [] });
   } catch (error) {
     next(error);
   }

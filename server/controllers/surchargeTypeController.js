@@ -4,7 +4,7 @@ const surchargeTypeService = require('../services/surchargeTypeService.js');
 exports.getAll = async (req, res, next) => {
   try {
     const items = await surchargeTypeService.findAll();
-    res.json(items);
+    res.json({ surchargeTypes: items || [] });
   } catch (error) {
     next(error);
   }

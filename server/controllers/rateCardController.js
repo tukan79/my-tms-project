@@ -9,7 +9,7 @@ exports.getAllRateCards = async (req, res, next) => {
     logger.info('Fetching all rate cards', { context });
     const rateCards = await rateCardService.findAllRateCards();
     logger.info(`Successfully fetched ${rateCards.length} rate cards`, { context });
-    res.json(rateCards);
+    res.json({ rateCards: rateCards || [] });
   } catch (error) {
     logger.error('Error fetching rate cards', { context, error: error.message });
     next(error);
@@ -58,7 +58,7 @@ exports.getEntriesByRateCardId = async (req, res, next) => {
     logger.info('Fetching rate entries for rate card', { context, rateCardId: id });
     const entries = await rateCardService.findEntriesByRateCardId(id);
     logger.info(`Successfully fetched ${entries.length} rate entries`, { context, rateCardId: id });
-    res.json(entries);
+    res.json({ entries: entries || [] });
   } catch (error) {
     logger.error('Error fetching rate entries', { context, error: error.message, rateCardId: req.params.id });
     next(error);
@@ -72,7 +72,7 @@ exports.getCustomersByRateCardId = async (req, res, next) => {
     logger.info('Fetching customers for rate card', { context, rateCardId: id });
     const customers = await rateCardService.findCustomersByRateCardId(id);
     logger.info(`Successfully fetched ${customers.length} customers`, { context, rateCardId: id });
-    res.json(customers);
+    res.json({ customers: customers || [] });
   } catch (error) {
     logger.error('Error fetching customers for rate card', { context, error: error.message, rateCardId: req.params.id });
     next(error);

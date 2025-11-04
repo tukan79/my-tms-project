@@ -6,7 +6,7 @@ const Papa = require('papaparse');
 exports.getAllOrders = async (req, res, next) => {
   try {
     const orders = await orderService.findAllOrders();
-    res.json(orders);
+    res.json({ orders: orders || [] });
   } catch (error) {
     next(error);
   }
