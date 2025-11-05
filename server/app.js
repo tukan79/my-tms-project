@@ -1,6 +1,7 @@
 // Plik server/app.js - Konfiguracja aplikacji Express
 const express = require('express');
 const cors = require('cors');
+const path = require('path'); // Dodajemy moduł 'path'
 const helmet = require('helmet');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
@@ -130,6 +131,11 @@ app.get('/health', async (req, res) => {
     res.status(503).json({ status: 'error', database: 'disconnected' });
   }
 });
+
+// --- Serwowanie plików statycznych ---
+// To middleware powinno być umieszczone PRZED trasami API.
+// Zakładamy, że pliki takie jak manifest.json, ikony itp. znajdują się w folderze 'public' w głównym katalogu serwera.
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Montowanie tras
 app.use('/api/auth', authRoutes);

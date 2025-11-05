@@ -143,10 +143,22 @@ const refreshToken = async (req, res, next) => {
       return res.status(403).json({ error: 'Token odświeżający jest nieaktualny. Zaloguj się ponownie.' });
     }
 
-    // Krok 4: Generujemy nowy accessToken
-    const accessToken = await authService.refreshAccessToken(user);
+    // Krok 4: Generujemy nową parę tokenów (accessToken i refreshToken)
+    const { accessToken, refreshToken: newRefreshToken } = await authService.rotateTokens(user);
 
-    return res.json({ accessToken });
+    // Krok 5: Ustawiamy nowe ciasteczko z nowym refreshToken
+    res.cookie('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      path: '/api/auth/refresh',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dni
+    });
+
+    return res.json({
+      accessToken,
+      message: 'Token successfully refreshed.' // Opcjonalny komunikat
+    });
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
       return res.status(403).json({ error: 'Token odświeżający wygasł. Proszę zalogować się ponownie.' });
