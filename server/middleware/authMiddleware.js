@@ -27,6 +27,35 @@ const authenticateToken = (req, res, next) => {
 };
 
 /**
+ * Opcjonalne middleware do autentykacji.
+ * Próbuje zweryfikować token, jeśli jest dostępny, i dodaje `req.auth`.
+ * Jeśli tokenu nie ma lub jest nieprawidłowy, po prostu przechodzi dalej bez błędu.
+ */
+const optionalAuth = (req, res, next) => {
+  const header = req.headers.authorization;
+  const token = header && header.startsWith('Bearer ') ? header.slice(7) : null;
+
+  // Jeśli nie ma tokenu, po prostu idź dalej. req.auth będzie niezdefiniowane.
+  if (!token) {
+    return next();
+  }
+
+  if (!process.env.JWT_SECRET) {
+    // Ten błąd powinien być logowany, ale nie powinien zatrzymywać żądania
+    console.error('Server Error: JWT_SECRET is not defined for optional auth.');
+    return next();
+  }
+
+  try {
+    const auth = jwt.verify(token, process.env.JWT_SECRET);
+    req.auth = auth; // Dodaj dane użytkownika do żądania
+  } catch (err) {
+    // Ignoruj błędy weryfikacji (np. wygaśnięcie tokenu) i po prostu kontynuuj
+  }
+  return next();
+};
+
+/**
  * Middleware do sprawdzania, czy użytkownik ma jedną z wymaganych ról.
  * @param {string[]} roles - Tablica dozwolonych ról (np. ['admin', 'dispatcher']).
  */
@@ -42,5 +71,6 @@ const requireRole = (roles) => {
 
 module.exports = {
   authenticateToken,
-  requireRole
+  requireRole,
+  optionalAuth,
 };

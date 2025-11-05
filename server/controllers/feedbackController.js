@@ -9,21 +9,26 @@ exports.reportBug = async (req, res, next) => {
       return res.status(400).json({ error: 'Description is required.' });
     }
 
-    // Dodajemy informacje o użytkowniku z tokenu dla bezpieczeństwa
+    // Sprawdzamy, czy użytkownik jest zalogowany (czy istnieje req.auth)
+    const userId = req.auth ? req.auth.userId : null;
+    const reportingUser = req.auth ? { email: req.auth.email, userId: req.auth.userId, role: req.auth.role } : { email: 'Anonymous' };
+
+    // Dodajemy informacje o użytkowniku (jeśli jest) i inne dane kontekstowe
     const reportContext = {
       ...context,
       userAgent: req.headers['user-agent'], // Dodajemy User-Agent
     };
 
     // Krok 1: Zapisz zgłoszenie w bazie danych
-    const newReport = await feedbackService.createBugReport(description, reportContext, req.auth.userId);
+    const newReport = await feedbackService.createBugReport(description, reportContext, userId);
 
     // Krok 2 (Opcjonalny): Wyślij powiadomienie email
-    // Używamy pełnego kontekstu z req.auth do wysyłki emaila
-    const emailContext = { ...reportContext, reportingUser: req.auth };
+    const emailContext = { ...reportContext, reportingUser };
     feedbackService.sendBugReportEmail(description, emailContext).catch(emailError => {
       // Logujemy błąd wysyłki, ale nie blokujemy odpowiedzi dla użytkownika
-      console.error('Failed to send bug report email, but the report was saved.', emailError);
+      // Używamy loggera dla spójności
+      const logger = require('../config/logger.js');
+      logger.error('Failed to send bug report email, but the report was saved.', { error: emailError });
     });
 
     res.status(201).json({ message: 'Bug report submitted successfully.', reportId: newReport.id });
