@@ -28,9 +28,9 @@ router.post('/logout', authController.logout);
 // Nowa trasa do odświeżania tokenu
 router.post('/refresh-token', authController.refreshToken);
 
-// Dodajemy brakującą trasę do weryfikacji tokenu
-// Adding the missing route for token verification
-router.get('/verify', authMiddleware.authenticateToken, authController.verifyToken);
+// Endpoint do pobierania danych zalogowanego użytkownika na podstawie tokenu
+// Endpoint to get the current user's data based on the token
+router.get('/me', authMiddleware.authenticateToken, authController.getMe);
 
 // Trasa statusu serwera (można przenieść do innego pliku, np. systemRoutes.js)
 // Server status route (can be moved to another file, e.g., systemRoutes.js)

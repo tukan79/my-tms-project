@@ -97,23 +97,24 @@ const login = async (req, res, next) => {
   }
 };
 
-// --- Weryfikacja access tokenu ---
-const verifyToken = async (req, res, next) => {
+// --- Pobieranie danych zalogowanego użytkownika ---
+const getMe = async (req, res, next) => {
   try {
-    const user = await userService.findUserById(req.auth.userId);
-    if (!user) {
-      return res.status(404).json({ error: 'Nie znaleziono użytkownika.' });
+    // req.auth jest dodawane przez middleware authenticateToken
+    if (!req.auth || !req.auth.userId) {
+      return res.status(401).json({ error: 'Authentication data not found in token.' });
     }
 
-    const userPayload = {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-      firstName: user.firstName,
-      lastName: user.lastName,
-    };
+    const user = await userService.findUserById(req.auth.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User associated with this token no longer exists.' });
+    }
 
-    return res.json({ valid: true, user: userPayload });
+    // Zwracamy obiekt użytkownika bez hasha hasła i tokenu odświeżania
+    // Serwis findUserById już to robi, więc nie musimy niczego wykluczać.
+    // Dodatkowo, konwertujemy pola na snake_case dla spójności z resztą API.
+    const { passwordHash, refreshToken, ...userPayload } = user.get({ plain: true });
+    return res.json(userPayload);
   } catch (error) {
     next(error);
   }
@@ -198,7 +199,7 @@ module.exports = {
   register,
   loginValidation,
   login,
-  verifyToken,
+  getMe,
   logout,
   refreshToken,
 };
