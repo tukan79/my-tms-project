@@ -16,5 +16,8 @@
     "nodejs"
   ],
   "author": "Krzysztof Stolarski",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "resend": "^6.4.1"
+  }
 }
