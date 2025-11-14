@@ -1,0 +1,43 @@
+services:
+  - name: tms-backend
+    type: web
+    env: node
+    plan: starter
+    region: frankfurt
+    autoDeploy: true
+
+    # 👇 Najważniejsze!
+    rootDir: server
+
+    buildCommand: "npm install"
+    startCommand: "node server.js"
+
+    envVars:
+      NODE_ENV: production
+      PORT: 10000
+
+      JWT_SECRET:
+        fromSecret: JWT_SECRET
+
+      DB_HOST:
+        fromSecret: DB_HOST
+      DB_PORT:
+        fromSecret: DB_PORT
+      DB_USER:
+        fromSecret: DB_USER
+      DB_PASS:
+        fromSecret: DB_PASS
+      DB_NAME:
+        fromSecret: DB_NAME
+      DB_URL:
+        fromSecret: DATABASE_URL
+
+      FRONTEND_URL:
+        fromSecret: FRONTEND_URL
+
+    healthCheckPath: "/health"
+
+    disk:
+      name: temp-storage
+      mountPath: "/opt/render/project/.cache"
+      sizeGB: 1
