@@ -2,22 +2,23 @@ services:
   - name: tms-backend
     type: web
     env: node
-    plan: starter     # lub free, jeśli używasz darmowego
-    region: frankfurt  # najlepszy dla EU/UK
+    plan: starter
+    region: frankfurt
     autoDeploy: true
 
+    # 👇 Najważniejsze!
+    rootDir: server
+
     buildCommand: "npm install"
-    startCommand: "node server/server.js"
+    startCommand: "node server.js"
 
     envVars:
       NODE_ENV: production
       PORT: 10000
 
-      # 🔐 JWT
       JWT_SECRET:
         fromSecret: JWT_SECRET
 
-      # 🐘 DATABASE
       DB_HOST:
         fromSecret: DB_HOST
       DB_PORT:
@@ -31,7 +32,6 @@ services:
       DB_URL:
         fromSecret: DATABASE_URL
 
-      # 🌐 CORS FRONTEND
       FRONTEND_URL:
         fromSecret: FRONTEND_URL
 
