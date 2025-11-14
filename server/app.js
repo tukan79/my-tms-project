@@ -30,56 +30,42 @@ const { sequelize } = require('./models');
 
 const app = express();
 
+// Render & proxies
 app.set('trust proxy', 1);
 
-// Basic middleware order
+// Core middlewares
 app.use(cookieParser());
 app.use(compression());
 app.use(express.json({ limit: '10mb' }));
-
 app.use(helmet());
+app.use(hpp());
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    const allowedOriginsPatterns = [
-      /\.vercel\.app$/,
-      'http://localhost:3000',
-      'http://localhost:5173',
-      'http://127.0.0.1:5173',
-    ];
-    if (!origin || allowedOriginsPatterns.some(pattern => {
-      if (pattern instanceof RegExp) return pattern.test(origin);
-      return origin === pattern;
-    })) {
-      callback(null, true);
-    } else {
-      callback(new Error(`Not allowed by CORS for origin: ${origin}`));
-    }
-  },
+// CORS (Vercel frontend + local dev + wildcard *.vercel.app)
+app.use(cors({
+  origin: [
+    /\.vercel\.app$/,
+    'https://my-tms-project-frontend.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173'
+  ],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-};
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
 
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+app.options('*', cors());
 
-// --- Rate limiters ---
-// Dedicated limiter for auth routes is already applied in routes/authRoutes.js (authLimiter).
-// We set a generous global limiter for API to avoid blocking normal SPA traffic.
+// Global rate limit (auth has its own limiter)
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === 'production' ? 2000 : 5000, // high for SPA/dev
+  windowMs: 15 * 60 * 1000,
+  max: process.env.NODE_ENV === 'production' ? 2000 : 5000,
   standardHeaders: true,
   legacyHeaders: false,
 });
-
-// Apply global API limiter AFTER CORS and security, but BEFORE routes
 app.use('/api', apiLimiter);
 
-app.use(hpp());
-
-// No-cache for API
+// Forbid caching API responses
 app.use('/api', (req, res, next) => {
   res.setHeader('Cache-Control', 'no-store');
   next();
@@ -89,25 +75,28 @@ app.use('/api', (req, res, next) => {
 if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
 } else {
-  const stream = { write: (message) => logger.info(message.trim()) };
+  const stream = { write: (msg) => logger.info(msg.trim()) };
   app.use(morgan('combined', { stream }));
 }
 
-// Health check
+// Health check endpoint (Render uses it)
 app.get('/health', async (req, res) => {
   try {
     await sequelize.authenticate();
-    res.status(200).json({ status: 'OK', database: 'connected', timestamp: new Date().toISOString() });
+    res.status(200).json({
+      status: 'OK',
+      db: 'connected',
+      timestamp: new Date().toISOString()
+    });
   } catch (error) {
-    logger.error('Health check failed:', { error: error.message });
-    res.status(503).json({ status: 'error', database: 'disconnected' });
+    res.status(503).json({ status: 'ERROR', db: 'disconnected' });
   }
 });
 
-// Serve static assets
+// Static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Mount routes (authRoutes has its own authLimiter for login/register)
+// API routes
 app.use('/api/auth', authRoutes);
 app.use('/api/drivers', driverRoutes);
 app.use('/api/users', userRoutes);
@@ -124,10 +113,11 @@ app.use('/api/invoices', invoiceRoutes);
 app.use('/api/feedback', feedbackRoutes);
 
 // 404 handler
-app.use((req, res, next) => {
+app.use((req, res) => {
   res.status(404).json({ error: `Resource not found: ${req.originalUrl}` });
 });
 
+// Global error handler
 app.use(errorMiddleware);
 
 module.exports = app;

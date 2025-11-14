@@ -1,71 +1,55 @@
-// Plik server/server.js - Główny plik startowy serwera
+// server/server.js — Główny plik startowy backendu
 
-// Warunkowo ładujemy dotenv tylko w środowisku deweloperskim.
-// Na produkcji (np. na Render) zmienne są dostarczane bezpośrednio.
-if (process.env.NODE_ENV !== 'production') { 
+// Ładujemy .env tylko lokalnie (Render ustawia zmienne środowiskowe sam)
+if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config();
 }
 
-// DIAGNOSTYKA: Sprawdź zmienne środowiskowe
-console.log('🔑 Checking environment variables:');
-console.log('   JWT_SECRET exists:', !!process.env.JWT_SECRET);
-console.log('   JWT_SECRET value:', process.env.JWT_SECRET ? '***SET***' : 'NOT SET');
-console.log('   All env vars:', Object.keys(process.env).filter(key => key.includes('JWT')));
-
-if (!process.env.JWT_SECRET) {
-  console.error('❌ CRITICAL: JWT_SECRET is not available to the application!');
-}
-
 const app = require('./app.js');
-const { sequelize } = require('./models'); // Importujemy instancję Sequelize
-const userService = require('./services/userService.js'); // Importujemy serwis użytkownika
+const { sequelize } = require('./models');
+const userService = require('./services/userService.js');
 
-// Używamy bardziej specyficznej zmiennej, aby uniknąć konfliktów z globalnym `PORT`
-// Na platformach takich jak Render, aplikacja musi nasłuchiwać na porcie zdefiniowanym w zmiennej środowiskowej `PORT`.
-// Używamy `process.env.PORT` dla zgodności z produkcją, a `process.env.API_PORT` jako fallback dla lokalnego rozwoju.
+// Render dostarcza PORT — musimy go użyć.
 const PORT = process.env.PORT || process.env.API_PORT || 3000;
 
 let server;
 
 const startServer = async () => {
   try {
-    // Krok 1: Sprawdź połączenie z bazą danych przed uruchomieniem serwera
-    console.log('🔵 Verifying database connection...');
-    await sequelize.authenticate(); // Używamy metody Sequelize do weryfikacji połączenia
-    console.log('✅ Database connection has been established successfully.');
+    console.log('🔵 Connecting to database...');
+    await sequelize.authenticate();
+    console.log('✅ Database connection OK.');
 
-    // Krok 1a: Utwórz domyślnego użytkownika-administratora, jeśli nie istnieje.
+    // Create default admin user if missing
     await userService.createDefaultAdminUser();
 
-    // Krok 2: Uruchom serwer Express
     server = app.listen(PORT, '0.0.0.0', () => {
-      console.log(`🚀 Server is running on port ${PORT} and is accessible from your network.`);
+      console.log(`🚀 Server running on port ${PORT}`);
     });
 
-    // Ulepszona obsługa błędów serwera
     server.on('error', (error) => {
-      if (error.syscall !== 'listen') throw error;
       if (error.code === 'EADDRINUSE') {
-        console.error(`❌ Error: Port ${PORT} is already in use.`);
+        console.error(`❌ Port ${PORT} is already in use.`);
         process.exit(1);
       }
+      throw error;
     });
+
   } catch (error) {
-    console.error('🔥 Failed to start server due to database connection error:', error.message);
+    console.error('🔥 SERVER START FAILED:', error.message);
     process.exit(1);
   }
 };
 
 startServer();
 
-// --- Graceful Shutdown ---
-// Obsługa sygnału SIGTERM, który jest wysyłany przez platformy takie jak Render podczas wdrożeń.
+// --- Graceful shutdown for Render ---
 const gracefulShutdown = () => {
-  console.log('🟡 SIGTERM signal received: closing HTTP server.');
+  console.log('🟡 Closing server...');
   server.close(() => {
-    console.log('✅ HTTP server closed.');
+    console.log('🟢 Server closed.');
     sequelize.close().then(() => {
-      console.log('🐘 Sequelize connection has been closed.');
+      console.log('🐘 DB connection closed.');
       process.exit(0);
     });
   });
